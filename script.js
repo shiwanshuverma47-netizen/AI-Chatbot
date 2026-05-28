@@ -12,6 +12,7 @@ const menuToggle  = document.getElementById('menuToggle');
 const sidebar     = document.querySelector('.sidebar');
 
 let activeSubject = 'finance';
+// Initialize
 
 // Subject tab switching
 subjectBtns.forEach(btn => {
