@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MBA Buddy – Your Smart Study Assistant</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body>
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+
+    <!-- Brand -->
+    <div class="sidebar-brand">
+      <div class="brand-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+      <div>
+        <h1 class="brand-name">MBA Buddy</h1>
+        <p class="brand-tagline">Your smart study assistant</p>
+      </div>
+    </div>
+
+    <!-- Subject Tabs -->
+    <div class="subject-label">Choose a subject</div>
+    <div class="subject-tabs">
+      <button class="subject-btn active" data-subject="finance">
+        <i class="fa-solid fa-coins"></i> Finance
+      </button>
+      <button class="subject-btn" data-subject="marketing">
+        <i class="fa-solid fa-bullhorn"></i> Marketing
+      </button>
+      <button class="subject-btn" data-subject="hr">
+        <i class="fa-solid fa-users"></i> HR
+      </button>
+      <button class="subject-btn" data-subject="operations">
+        <i class="fa-solid fa-gears"></i> Operations
+      </button>
+    </div>
+
+    <!-- Quick Topics -->
+    <div class="subject-label" style="margin-top:20px">Quick topics</div>
+
+    <div class="topic-group" id="topics-finance">
+      <button class="topic-chip">What is NPV?</button>
+      <button class="topic-chip">Explain CAPM</button>
+      <button class="topic-chip">Capital Structure</button>
+      <button class="topic-chip">Ratio Analysis</button>
+      <button class="topic-chip">Quiz me on Finance</button>
+    </div>
+
+    <div class="topic-group hidden" id="topics-marketing">
+      <button class="topic-chip">Explain 4Ps</button>
+      <button class="topic-chip">What is STP?</button>
+      <button class="topic-chip">Consumer Behaviour</button>
+      <button class="topic-chip">Branding strategy</button>
+      <button class="topic-chip">Quiz me on Marketing</button>
+    </div>
+
+    <div class="topic-group hidden" id="topics-hr">
+      <button class="topic-chip">Recruitment process</button>
+      <button class="topic-chip">Performance Management</button>
+      <button class="topic-chip">What is OB?</button>
+      <button class="topic-chip">Labour Laws India</button>
+      <button class="topic-chip">Quiz me on HR</button>
+    </div>
+
+    <div class="topic-group hidden" id="topics-operations">
+      <button class="topic-chip">Supply Chain basics</button>
+      <button class="topic-chip">What is Six Sigma?</button>
+      <button class="topic-chip">TQM explained</button>
+      <button class="topic-chip">Inventory Management</button>
+      <button class="topic-chip">Quiz me on Operations</button>
+    </div>
+
+    <!-- Clear Chat -->
+    <button class="clear-btn" id="clearBtn">
+      <i class="fa-solid fa-rotate-left"></i> Clear chat
+    </button>
+
+  </aside>
+
+  <!-- ===== MAIN CHAT AREA ===== -->
+  <main class="chat-main">
+
+    <!-- Top bar -->
+    <header class="chat-header">
+      <button class="menu-toggle" id="menuToggle">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="header-info">
+        <div class="header-avatar"><i class="fa-solid fa-robot"></i></div>
+        <div>
+          <p class="header-name">MBA Buddy</p>
+          <p class="header-status">
+            <span class="status-dot"></span>Online — ask me anything
+          </p>
+        </div>
+      </div>
+      <div class="header-badge" id="activeBadge">Finance</div>
+    </header>
+
+    <!-- Messages -->
+    <div class="messages" id="messages">
+
+      <!-- Welcome message -->
+      <div class="msg bot-msg">
+        <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
+        <div class="msg-bubble">
+          <p>Hi! I'm <strong>MBA Buddy</strong> 👋</p>
+          <p style="margin-top:8px">I can help you with:</p>
+          <ul class="welcome-list">
+            <li><i class="fa-solid fa-circle-check"></i> Explain any MBA topic simply</li>
+            <li><i class="fa-solid fa-circle-check"></i> Quiz you on Finance, Marketing, HR & Ops</li>
+            <li><i class="fa-solid fa-circle-check"></i> Give quick revision notes before exams</li>
+          </ul>
+          <p style="margin-top:10px">Pick a subject on the left or just ask me anything!</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Input area -->
+    <div class="input-area">
+      <div class="input-row">
+        <button class="quiz-btn" id="quizBtn">
+          <i class="fa-solid fa-bolt"></i> Quiz me
+        </button>
+        <input
+          type="text"
+          id="userInput"
+          class="chat-input"
+          placeholder="Ask a question or type a topic..."
+          autocomplete="off"
+        />
+        <button class="send-btn" id="sendBtn">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
