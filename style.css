@@ -450,6 +450,7 @@ body {
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.22);
   border: 1px solid rgba(255,255,255,0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  backdrop-filter: blur(10px);
 }
 .assistant-corner:hover {
   transform: translateY(-2px);
