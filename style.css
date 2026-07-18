@@ -225,6 +225,7 @@ body {
   font-size: 12px;
   font-weight: 700;
   border: 1px solid #ddd6fe;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.12);
 }
 .assistant-pill i {
   font-size: 12px;
@@ -447,6 +448,7 @@ body {
   background: var(--navy);
   color: var(--white);
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.22);
+  border: 1px solid rgba(255,255,255,0.08);
 }
 .assistant-corner-icon {
   width: 32px;
