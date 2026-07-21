@@ -130,14 +130,20 @@ function getBotReply(userText) {
   return subjectReplies[activeSubject].default;
 }
 
+function formatTime() {
+  return new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+}
+
 function addMessage(text, role, persist = true) {
   const div = document.createElement('div');
   div.className = 'msg ' + (role === 'bot' ? 'bot-msg' : 'user-msg');
 
+  const timestamp = `<span class="msg-time">${formatTime()}</span>`;
+
   if (role === 'bot') {
-    div.innerHTML = `<div class="msg-avatar"><i class="fa-solid fa-robot"></i></div><div class="msg-bubble">${text}</div>`;
+    div.innerHTML = `<div class="msg-avatar"><i class="fa-solid fa-robot"></i></div><div class="msg-bubble">${text}<div class="msg-meta">${timestamp}</div></div>`;
   } else {
-    div.innerHTML = `<div class="msg-bubble">${text}</div>`;
+    div.innerHTML = `<div class="msg-bubble">${text}<div class="msg-meta">${timestamp}</div></div>`;
   }
 
   messages.appendChild(div);
