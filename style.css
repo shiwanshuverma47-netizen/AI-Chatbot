@@ -334,6 +334,15 @@ body {
   opacity: 0.7;
   text-align: right;
 }
+.empty-state {
+  padding: 16px;
+  border: 1px dashed var(--gray-300);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+  background: var(--gray-50);
+  text-align: center;
+  font-size: 13px;
+}
 .bot-msg .msg-bubble {
   background: var(--white);
   border: 1px solid var(--gray-100);

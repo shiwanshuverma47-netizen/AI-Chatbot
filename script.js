@@ -96,6 +96,10 @@ function saveChatHistory() {
 
 function renderChatHistory() {
   messages.innerHTML = '';
+  if (!chatHistory.length) {
+    messages.innerHTML = '<div class="empty-state">Start a conversation to save your study notes here.</div>';
+    return;
+  }
   chatHistory.forEach((entry) => addMessage(entry.text, entry.role, false));
   messages.scrollTop = messages.scrollHeight;
 }
