@@ -273,6 +273,10 @@ body {
   background: var(--purple-light);
   color: var(--purple);
 }
+.mode-pill {
+  background: #dcfce7;
+  color: #166534;
+}
 
 /* ===== MESSAGES ===== */
 .messages {
