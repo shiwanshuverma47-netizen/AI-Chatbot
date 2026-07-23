@@ -41,3 +41,22 @@ mba-buddy-ai-chatbot/
 * **requirements.txt** – Lists all required Python packages.
 
 
+## 🛠️ Tech Stack
+
+| Category        | Technology         |
+| --------------- | ------------------ |
+| Language        | Python             |
+| Frontend        | Streamlit          |
+| AI Model        | Groq LLM           |
+| Environment     | python-dotenv      |
+| Version Control | Git & GitHub       |
+| Package Manager | pip                |
+| IDE             | Visual Studio Code |
+
+### Why These Technologies?
+
+* **Python** for backend logic and AI integration.
+* **Streamlit** for building an interactive chatbot interface.
+* **Groq LLM** for fast AI-powered responses.
+* **Git & GitHub** for version control and collaboration.
+* **VS Code** for efficient development.
