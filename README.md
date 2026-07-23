@@ -14,6 +14,30 @@ A polished MBA study assistant chatbot UI with subject-based shortcuts, quick pr
 * 📱 Clean, user-friendly, and responsive design
 
 
-## Run locally
-Open index.html in your browser or serve the folder with any static file server.
+## 📁 Project Structure
+
+```text
+mba-buddy-ai-chatbot/
+├── app.py                 # Main application entry point
+├── requirements.txt       # Python dependencies
+├── .env.example           # Environment variables template
+├── assets/                # Images, icons, and static resources
+├── src/                   # Application source code
+│   ├── chatbot/           # Chatbot logic
+│   ├── services/          # AI and API integrations
+│   ├── utils/             # Helper functions
+│   └── config/            # Configuration files
+├── README.md              # Project documentation
+└── LICENSE                # License information
+```
+
+### Folder Overview
+
+* **app.py** – Starts the chatbot application.
+* **src/chatbot** – Contains conversation handling and response generation.
+* **src/services** – Manages AI model and external API communication.
+* **src/utils** – Includes reusable helper functions.
+* **assets** – Stores images and other static resources.
+* **requirements.txt** – Lists all required Python packages.
+
 
