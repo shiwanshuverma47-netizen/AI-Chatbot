@@ -83,3 +83,4 @@ Contributions are welcome! If you'd like to improve the MBA Buddy AI Chatbot, fo
 5. Push the branch and open a Pull Request.
 
 Please ensure your code follows the project's coding standards and includes appropriate documentation where necessary.
+
