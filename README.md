@@ -60,3 +60,13 @@ mba-buddy-ai-chatbot/
 * **Groq LLM** for fast AI-powered responses.
 * **Git & GitHub** for version control and collaboration.
 * **VS Code** for efficient development.
+## 🚀 Future Improvements
+
+* Add user authentication and personalized chat history.
+* Support multiple AI models with easy switching.
+* Enable PDF and document upload for MBA-related queries.
+* Introduce voice input and text-to-speech responses.
+* Save and export chat conversations.
+* Add dark/light theme toggle.
+* Improve response accuracy with Retrieval-Augmented Generation (RAG).
+* Deploy the application on a cloud platform for public access.
