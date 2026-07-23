@@ -70,3 +70,16 @@ mba-buddy-ai-chatbot/
 * Add dark/light theme toggle.
 * Improve response accuracy with Retrieval-Augmented Generation (RAG).
 * Deploy the application on a cloud platform for public access.
+
+
+## 🤝 Contributing
+
+Contributions are welcome! If you'd like to improve the MBA Buddy AI Chatbot, follow these steps:
+
+1. Fork the repository.
+2. Create a new feature branch.
+3. Make your changes and test them.
+4. Commit your changes with a clear commit message.
+5. Push the branch and open a Pull Request.
+
+Please ensure your code follows the project's coding standards and includes appropriate documentation where necessary.
