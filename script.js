@@ -16,6 +16,7 @@ const themeToggle = document.getElementById('themeToggle');
 
 const STORAGE_KEY = 'mba-buddy-chat-history';
 const THEME_STORAGE_KEY = window.MBA_BUDDY_CONFIG?.themeKey || 'mba-buddy-theme';
+const SUBJECT_STORAGE_KEY = 'mba-buddy-active-subject';
 let activeSubject = 'finance';
 let chatHistory = [];
 
@@ -49,6 +50,7 @@ function setActiveSubject(subject, button) {
   }
 
   activeSubject = subject;
+  localStorage.setItem(SUBJECT_STORAGE_KEY, subject);
   activeBadge.textContent = button?.dataset.label || subject.charAt(0).toUpperCase() + subject.slice(1);
 
   document.querySelectorAll('.topic-group').forEach((group) => group.classList.add('hidden'));
@@ -119,10 +121,14 @@ function saveChatHistory() {
   }
 }
 
+function showEmptyState() {
+  messages.innerHTML = '<div class="empty-state">Start a conversation to save your study notes here.</div>';
+}
+
 function renderChatHistory() {
   messages.innerHTML = '';
   if (!chatHistory.length) {
-    messages.innerHTML = '<div class="empty-state">Start a conversation to save your study notes here.</div>';
+    showEmptyState();
     return;
   }
   chatHistory.forEach((entry) => addMessage(entry.text, entry.role, false));
@@ -225,7 +231,8 @@ quizBtn.addEventListener('click', () => {
 clearBtn.addEventListener('click', () => {
   chatHistory = [];
   saveChatHistory();
-  messages.innerHTML = '';
+  showEmptyState();
+  updateSuggestionChips();
 });
 
 menuToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
@@ -250,4 +257,9 @@ if (chatHistory.length) {
 } else {
   updateSuggestionChips();
 }
-setActiveSubject(activeSubject, document.querySelector('.subject-btn.active'));
+
+const savedSubject = localStorage.getItem(SUBJECT_STORAGE_KEY);
+const initialButton = savedSubject
+  ? document.querySelector(`.subject-btn[data-subject="${savedSubject}"]`)
+  : document.querySelector('.subject-btn.active');
+setActiveSubject(savedSubject || activeSubject, initialButton || document.querySelector('.subject-btn.active'));
