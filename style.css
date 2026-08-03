@@ -486,6 +486,7 @@ body {
   transition: border-color var(--transition);
 }
 .input-row:focus-within { border-color: var(--purple); }
+.chat-input:focus::placeholder { color: transparent; }
 .input-hint {
   margin-top: 8px;
   font-size: 11px;
