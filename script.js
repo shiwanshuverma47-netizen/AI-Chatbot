@@ -15,7 +15,7 @@ const quickSuggestions = document.getElementById('quickSuggestions');
 const themeToggle = document.getElementById('themeToggle');
 
 const STORAGE_KEY = 'mba-buddy-chat-history';
-const THEME_STORAGE_KEY = 'mba-buddy-theme';
+const THEME_STORAGE_KEY = window.MBA_BUDDY_CONFIG?.themeKey || 'mba-buddy-theme';
 let activeSubject = 'finance';
 let chatHistory = [];
 
@@ -107,7 +107,8 @@ function applyTheme(theme) {
 function initializeTheme() {
   const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-  const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+  const defaultTheme = window.MBA_BUDDY_CONFIG?.defaultTheme || 'light';
+  const theme = savedTheme || (prefersDark ? 'dark' : defaultTheme);
   applyTheme(theme);
 }
 
