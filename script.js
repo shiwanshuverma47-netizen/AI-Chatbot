@@ -12,8 +12,10 @@ const saveStatus = document.getElementById('saveStatus');
 const menuToggle = document.getElementById('menuToggle');
 const sidebar = document.querySelector('.sidebar');
 const quickSuggestions = document.getElementById('quickSuggestions');
+const themeToggle = document.getElementById('themeToggle');
 
 const STORAGE_KEY = 'mba-buddy-chat-history';
+const THEME_STORAGE_KEY = 'mba-buddy-theme';
 let activeSubject = 'finance';
 let chatHistory = [];
 
@@ -85,6 +87,28 @@ function loadChatHistory() {
   } catch (error) {
     return [];
   }
+}
+
+function applyTheme(theme) {
+  document.body.setAttribute('data-theme', theme);
+
+  if (themeToggle) {
+    const icon = themeToggle.querySelector('i');
+    const label = themeToggle.querySelector('span');
+    if (icon) {
+      icon.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+    }
+    if (label) {
+      label.textContent = theme === 'dark' ? 'Light mode' : 'Dark mode';
+    }
+  }
+}
+
+function initializeTheme() {
+  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+  applyTheme(theme);
 }
 
 function saveChatHistory() {
@@ -205,6 +229,20 @@ clearBtn.addEventListener('click', () => {
 
 menuToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
 
+themeToggle?.addEventListener('click', () => {
+  const nextTheme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+  applyTheme(nextTheme);
+});
+
+themeToggle?.addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    themeToggle.click();
+  }
+});
+
+initializeTheme();
 chatHistory = loadChatHistory();
 if (chatHistory.length) {
   renderChatHistory();

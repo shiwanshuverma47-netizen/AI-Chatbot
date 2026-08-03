@@ -12,6 +12,7 @@ A polished MBA study assistant chatbot UI with subject-based shortcuts, quick pr
 * ⚡ Fast and responsive chat interface
 * 🛡️ Input validation and graceful error handling
 * 📱 Clean, user-friendly, and responsive design
+* 🌙 Dark/light theme toggle with local persistence
 
 
 ## 📁 Project Structure
