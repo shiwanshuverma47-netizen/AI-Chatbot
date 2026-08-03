@@ -86,3 +86,7 @@ Contributions are welcome! If you'd like to improve the MBA Buddy AI Chatbot, fo
 
 Please ensure your code follows the project's coding standards and includes appropriate documentation where necessary.
 
+## 📝 Recent Update
+
+The latest version adds a theme toggle for switching between light and dark modes, plus a more polished study-focused chat experience.
+
