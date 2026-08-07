@@ -14,6 +14,7 @@ A polished MBA study assistant chatbot UI with subject-based shortcuts, quick pr
 * 📱 Clean, user-friendly, and responsive design
 * 🌙 Dark/light theme toggle with local persistence
 * 🧠 Quick-study prompts for fast revision sessions
+* 📝 Save study notes from recent chat topics for quick revision
 
 
 ## 📁 Project Structure
@@ -88,5 +89,5 @@ Please ensure your code follows the project's coding standards and includes appr
 
 ## 📝 Recent Update
 
-The latest version adds a theme toggle for switching between light and dark modes, plus a more polished study-focused chat experience.
+The latest version adds a theme toggle for switching between light and dark modes, plus a more polished study-focused chat experience with saved revision notes.
 

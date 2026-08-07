@@ -13,12 +13,17 @@ const menuToggle = document.getElementById('menuToggle');
 const sidebar = document.querySelector('.sidebar');
 const quickSuggestions = document.getElementById('quickSuggestions');
 const themeToggle = document.getElementById('themeToggle');
+const saveNoteBtn = document.getElementById('saveNoteBtn');
+const notesPanel = document.getElementById('notesPanel');
+const toast = document.getElementById('toast');
 
 const STORAGE_KEY = 'mba-buddy-chat-history';
 const THEME_STORAGE_KEY = window.MBA_BUDDY_CONFIG?.themeKey || 'mba-buddy-theme';
 const SUBJECT_STORAGE_KEY = 'mba-buddy-active-subject';
+const NOTES_STORAGE_KEY = 'mba-buddy-saved-notes';
 let activeSubject = 'finance';
 let chatHistory = [];
+let savedNotes = [];
 
 const subjectReplies = {
   finance: {
@@ -119,6 +124,78 @@ function saveChatHistory() {
   if (saveStatus) {
     saveStatus.textContent = 'Autosaved';
   }
+}
+
+function showToast(message) {
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(showToast.timeoutId);
+  showToast.timeoutId = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+function loadSavedNotes() {
+  try {
+    const stored = localStorage.getItem(NOTES_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function renderNotes() {
+  if (!notesPanel) return;
+
+  if (!savedNotes.length) {
+    notesPanel.innerHTML = '<div class="note-empty">Save a topic summary to keep revision points for later.</div>';
+    return;
+  }
+
+  notesPanel.innerHTML = savedNotes
+    .map((note) => `
+      <article class="note-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <strong>${note.subject}</strong>
+          <button class="note-delete" data-id="${note.id}" aria-label="Delete note">✕</button>
+        </div>
+        <span>${note.createdAt}</span>
+        <p>${note.title}</p>
+      </article>
+    `)
+    .join('');
+
+  notesPanel.querySelectorAll('.note-delete').forEach((button) => {
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const id = button.getAttribute('data-id');
+      savedNotes = savedNotes.filter((note) => note.id !== id);
+      localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(savedNotes));
+      renderNotes();
+      showToast('Note removed');
+    });
+  });
+}
+
+function saveCurrentNote() {
+  if (!chatHistory.length) {
+    showToast('Start a conversation first');
+    return;
+  }
+
+  const latestUserEntry = [...chatHistory].reverse().find((entry) => entry.role === 'user');
+  const latestBotEntry = [...chatHistory].reverse().find((entry) => entry.role === 'bot');
+  const note = {
+    id: Date.now().toString(),
+    subject: activeBadge?.textContent || activeSubject.charAt(0).toUpperCase() + activeSubject.slice(1),
+    title: latestUserEntry ? latestUserEntry.text : 'Study session',
+    createdAt: new Date().toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }),
+    content: latestBotEntry ? latestBotEntry.text : subjectReplies[activeSubject].default
+  };
+
+  savedNotes = [note, ...savedNotes].slice(0, 5);
+  localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(savedNotes));
+  renderNotes();
+  showToast('Study note saved');
 }
 
 function showEmptyState() {
@@ -243,6 +320,8 @@ themeToggle?.addEventListener('click', () => {
   applyTheme(nextTheme);
 });
 
+saveNoteBtn?.addEventListener('click', saveCurrentNote);
+
 themeToggle?.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault();
@@ -252,6 +331,8 @@ themeToggle?.addEventListener('keydown', (event) => {
 
 initializeTheme();
 chatHistory = loadChatHistory();
+savedNotes = loadSavedNotes();
+renderNotes();
 if (chatHistory.length) {
   renderChatHistory();
 } else {

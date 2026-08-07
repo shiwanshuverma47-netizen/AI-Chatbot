@@ -73,6 +73,9 @@
       <button class="topic-chip">Quiz me on Operations</button>
     </div>
 
+    <div class="subject-label" style="margin-top:20px">Saved notes</div>
+    <div class="notes-panel" id="notesPanel" aria-live="polite"></div>
+
     <!-- Clear Chat -->
     <button class="clear-btn" id="clearBtn">
       <i class="fa-solid fa-rotate-left"></i> Clear chat
@@ -101,6 +104,10 @@
         <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle color theme" title="Switch between light and dark mode">
           <i class="fa-solid fa-moon"></i>
           <span>Dark mode</span>
+        </button>
+        <button class="save-note-btn" id="saveNoteBtn" type="button" aria-label="Save a study note" title="Save the latest topic as a revision note">
+          <i class="fa-solid fa-bookmark"></i>
+          <span>Save note</span>
         </button>
         <div class="assistant-pill">
           <i class="fa-solid fa-robot"></i>
@@ -162,6 +169,8 @@
     </div>
     <span>Assistant</span>
   </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="config.js"></script>
   <script src="script.js"></script>
