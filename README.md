@@ -20,28 +20,32 @@ A polished MBA study assistant chatbot UI with subject-based shortcuts, quick pr
 ## 📁 Project Structure
 
 ```text
-mba-buddy-ai-chatbot/
-├── app.py                 # Main application entry point
-├── requirements.txt       # Python dependencies
-├── .env.example           # Environment variables template
-├── assets/                # Images, icons, and static resources
-├── src/                   # Application source code
-│   ├── chatbot/           # Chatbot logic
-│   ├── services/          # AI and API integrations
-│   ├── utils/             # Helper functions
-│   └── config/            # Configuration files
-├── README.md              # Project documentation
-└── LICENSE                # License information
+AI-chatbot/
+├── index.html             # Main structure and layout
+├── style.css              # Visual styling and responsive design
+├── script.js              # Browser-side chat and UI logic
+├── config.js              # Frontend configuration
+└── README.md              # Project documentation
 ```
 
 ### Folder Overview
 
-* **app.py** – Starts the chatbot application.
-* **src/chatbot** – Contains conversation handling and response generation.
-* **src/services** – Manages AI model and external API communication.
-* **src/utils** – Includes reusable helper functions.
-* **assets** – Stores images and other static resources.
-* **requirements.txt** – Lists all required Python packages.
+* **index.html** – Loads the page structure for the MBA Buddy assistant.
+* **style.css** – Controls the visual design, responsive layout, and theming.
+* **script.js** – Manages subject switching, chat replies, note saving, and UI events.
+* **config.js** – Stores front-end configuration defaults.
+* **README.md** – Describes the project and local development workflow.
+
+## 🚀 Run Locally
+
+This project is a static web app. To run it locally:
+
+1. Open the repository in VS Code.
+2. Launch a local web server from the root directory, for example:
+   `python3 -m http.server 8000`
+3. Visit <http://localhost:8000> in a browser.
+
+The UI is built with vanilla HTML, CSS, and JavaScript, so no package installation is required unless you add dependencies later.
 
 
 ## 🛠️ Tech Stack
