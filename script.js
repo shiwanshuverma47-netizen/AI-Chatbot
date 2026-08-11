@@ -16,6 +16,7 @@ const themeToggle = document.getElementById('themeToggle');
 const saveNoteBtn = document.getElementById('saveNoteBtn');
 const notesPanel = document.getElementById('notesPanel');
 const toast = document.getElementById('toast');
+const focusCopy = document.getElementById('focusCopy');
 
 const STORAGE_KEY = 'mba-buddy-chat-history';
 const THEME_STORAGE_KEY = window.MBA_BUDDY_CONFIG?.themeKey || 'mba-buddy-theme';
@@ -29,22 +30,26 @@ const subjectReplies = {
   finance: {
     quiz: 'Quick finance quiz: What is the main difference between NPV and IRR?',
     tip: 'Finance revision tip: write one formula, one example, and one exam takeaway for every topic.',
-    default: 'I can help with finance topics like NPV, CAPM, ratio analysis, and capital structure.'
+    default: 'I can help with finance topics like NPV, CAPM, ratio analysis, and capital structure.',
+    focus: 'Finance • Build confidence with formulas and case examples'
   },
   marketing: {
     quiz: 'Quick marketing quiz: Why is segmentation important in a go-to-market strategy?',
     tip: 'Marketing revision tip: connect each concept to one real brand example for faster recall.',
-    default: 'I can help with marketing topics like 4Ps, STP, branding, and consumer behaviour.'
+    default: 'I can help with marketing topics like 4Ps, STP, branding, and consumer behaviour.',
+    focus: 'Marketing • Compare brand strategy with practical campaign examples'
   },
   hr: {
     quiz: 'Quick HR quiz: What is the main purpose of performance management systems?',
     tip: 'HR revision tip: summarise each topic in one definition, one example, and one challenge.',
-    default: 'I can help with HR topics like recruitment, performance management, and organizational behaviour.'
+    default: 'I can help with HR topics like recruitment, performance management, and organizational behaviour.',
+    focus: 'HR • Link people practices to organizational outcomes'
   },
   operations: {
     quiz: 'Quick operations quiz: How does inventory management affect customer service?',
     tip: 'Operations revision tip: focus on process flow, bottlenecks, and key metrics.',
-    default: 'I can help with operations topics like supply chain, Six Sigma, and inventory management.'
+    default: 'I can help with operations topics like supply chain, Six Sigma, and inventory management.',
+    focus: 'Operations • Map the process flow and identify bottlenecks'
   }
 };
 
@@ -64,7 +69,14 @@ function setActiveSubject(subject, button) {
     activeGroup.classList.remove('hidden');
   }
 
+  updateFocusStrip();
   updateSuggestionChips();
+}
+
+function updateFocusStrip() {
+  if (!focusCopy) return;
+  const currentSubject = subjectReplies[activeSubject] || subjectReplies.finance;
+  focusCopy.textContent = currentSubject.focus;
 }
 
 function updateSuggestionChips() {
