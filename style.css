@@ -720,3 +720,22 @@ body {
     padding: 8px 10px;
   }
 }
+.export-notes-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid var(--border-soft);
+  transition: transform var(--transition), background var(--transition), color var(--transition);
+}
+.export-notes-btn:hover {
+  transform: translateY(-1px);
+  background: #e6f6ff;
+  color: #055160;
+}
+.export-notes-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
