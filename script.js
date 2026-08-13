@@ -14,6 +14,7 @@ const sidebar = document.querySelector('.sidebar');
 const quickSuggestions = document.getElementById('quickSuggestions');
 const themeToggle = document.getElementById('themeToggle');
 const saveNoteBtn = document.getElementById('saveNoteBtn');
+const exportNotesBtn = document.getElementById('exportNotesBtn');
 const notesPanel = document.getElementById('notesPanel');
 const toast = document.getElementById('toast');
 const focusCopy = document.getElementById('focusCopy');
@@ -186,6 +187,33 @@ function renderNotes() {
       showToast('Note removed');
     });
   });
+  updateExportButtonState();
+}
+
+function updateExportButtonState() {
+  if (!exportNotesBtn) return;
+  const has = savedNotes && savedNotes.length > 0;
+  exportNotesBtn.disabled = !has;
+  exportNotesBtn.setAttribute('aria-disabled', (!has).toString());
+}
+
+function exportNotes() {
+  if (!savedNotes || !savedNotes.length) {
+    showToast('No notes to export');
+    return;
+  }
+
+  const data = JSON.stringify(savedNotes, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'mba-buddy-notes-' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast('Notes exported');
 }
 
 function saveCurrentNote() {
