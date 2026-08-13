@@ -208,12 +208,14 @@ function exportNotes() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'mba-buddy-notes-' + new Date().toISOString().slice(0,10) + '.json';
+  const datePart = new Date().toISOString().slice(0,10);
+  const subjectPart = (activeBadge?.textContent || activeSubject).toString().replace(/\s+/g, '-').toLowerCase();
+  a.download = `mba-buddy-notes-${subjectPart}-${savedNotes.length}-${datePart}.json`;
   document.body.appendChild(a);
   a.click();
   a.remove();
   URL.revokeObjectURL(url);
-  showToast('Notes exported');
+  showToast(`Exported ${savedNotes.length} note${savedNotes.length>1?'s':''}`);
 }
 
 function saveCurrentNote() {
