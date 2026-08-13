@@ -362,6 +362,15 @@ themeToggle?.addEventListener('click', () => {
 
 saveNoteBtn?.addEventListener('click', saveCurrentNote);
 
+// keyboard shortcut: Ctrl/Cmd+E to export notes
+document.addEventListener('keydown', (event) => {
+  const key = event.key.toLowerCase();
+  if ((event.ctrlKey || event.metaKey) && key === 'e') {
+    event.preventDefault();
+    exportNotes();
+  }
+});
+
 themeToggle?.addEventListener('keydown', (event) => {
   if (event.key === 'Enter' || event.key === ' ') {
     event.preventDefault();
