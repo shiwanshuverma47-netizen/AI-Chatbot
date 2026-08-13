@@ -382,6 +382,7 @@ initializeTheme();
 chatHistory = loadChatHistory();
 savedNotes = loadSavedNotes();
 renderNotes();
+updateExportButtonState();
 if (chatHistory.length) {
   renderChatHistory();
 } else {
