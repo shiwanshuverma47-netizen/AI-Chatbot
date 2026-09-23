@@ -24,16 +24,16 @@
     <!-- Subject Tabs -->
     <div class="subject-label">Choose a subject</div>
     <div class="subject-tabs">
-      <button class="subject-btn active" data-subject="finance" data-label="Finance">
+      <button class="subject-btn active" type="button" data-subject="finance" data-label="Finance" aria-pressed="true">
         <i class="fa-solid fa-coins"></i> Finance
       </button>
-      <button class="subject-btn" data-subject="marketing" data-label="Marketing">
+      <button class="subject-btn" type="button" data-subject="marketing" data-label="Marketing" aria-pressed="false">
         <i class="fa-solid fa-bullhorn"></i> Marketing
       </button>
-      <button class="subject-btn" data-subject="hr" data-label="HR">
+      <button class="subject-btn" type="button" data-subject="hr" data-label="HR" aria-pressed="false">
         <i class="fa-solid fa-users"></i> HR
       </button>
-      <button class="subject-btn" data-subject="operations" data-label="Operations">
+      <button class="subject-btn" type="button" data-subject="operations" data-label="Operations" aria-pressed="false">
         <i class="fa-solid fa-gears"></i> Operations
       </button>
     </div>
@@ -42,42 +42,42 @@
     <div class="subject-label" style="margin-top:20px">Quick topics</div>
 
     <div class="topic-group" id="topics-finance">
-      <button class="topic-chip">What is NPV?</button>
-      <button class="topic-chip">Explain CAPM</button>
-      <button class="topic-chip">Capital Structure</button>
-      <button class="topic-chip">Ratio Analysis</button>
-      <button class="topic-chip">Quiz me on Finance</button>
+      <button class="topic-chip" type="button">What is NPV?</button>
+      <button class="topic-chip" type="button">Explain CAPM</button>
+      <button class="topic-chip" type="button">Capital Structure</button>
+      <button class="topic-chip" type="button">Ratio Analysis</button>
+      <button class="topic-chip" type="button">Quiz me on Finance</button>
     </div>
 
     <div class="topic-group hidden" id="topics-marketing">
-      <button class="topic-chip">Explain 4Ps</button>
-      <button class="topic-chip">What is STP?</button>
-      <button class="topic-chip">Consumer Behaviour</button>
-      <button class="topic-chip">Branding strategy</button>
-      <button class="topic-chip">Quiz me on Marketing</button>
+      <button class="topic-chip" type="button">Explain 4Ps</button>
+      <button class="topic-chip" type="button">What is STP?</button>
+      <button class="topic-chip" type="button">Consumer Behaviour</button>
+      <button class="topic-chip" type="button">Branding strategy</button>
+      <button class="topic-chip" type="button">Quiz me on Marketing</button>
     </div>
 
     <div class="topic-group hidden" id="topics-hr">
-      <button class="topic-chip">Recruitment process</button>
-      <button class="topic-chip">Performance Management</button>
-      <button class="topic-chip">What is OB?</button>
-      <button class="topic-chip">Labour Laws India</button>
-      <button class="topic-chip">Quiz me on HR</button>
+      <button class="topic-chip" type="button">Recruitment process</button>
+      <button class="topic-chip" type="button">Performance Management</button>
+      <button class="topic-chip" type="button">What is OB?</button>
+      <button class="topic-chip" type="button">Labour Laws India</button>
+      <button class="topic-chip" type="button">Quiz me on HR</button>
     </div>
 
     <div class="topic-group hidden" id="topics-operations">
-      <button class="topic-chip">Supply Chain basics</button>
-      <button class="topic-chip">What is Six Sigma?</button>
-      <button class="topic-chip">TQM explained</button>
-      <button class="topic-chip">Inventory Management</button>
-      <button class="topic-chip">Quiz me on Operations</button>
+      <button class="topic-chip" type="button">Supply Chain basics</button>
+      <button class="topic-chip" type="button">What is Six Sigma?</button>
+      <button class="topic-chip" type="button">TQM explained</button>
+      <button class="topic-chip" type="button">Inventory Management</button>
+      <button class="topic-chip" type="button">Quiz me on Operations</button>
     </div>
 
     <div class="subject-label" style="margin-top:20px">Saved notes</div>
     <div class="notes-panel" id="notesPanel" aria-live="polite"></div>
 
     <!-- Clear Chat -->
-    <button class="clear-btn" id="clearBtn">
+    <button class="clear-btn" id="clearBtn" type="button">
       <i class="fa-solid fa-rotate-left"></i> Clear chat
     </button>
 
@@ -88,7 +88,7 @@
 
     <!-- Top bar -->
     <header class="chat-header">
-      <button class="menu-toggle" id="menuToggle">
+      <button class="menu-toggle" id="menuToggle" type="button" aria-label="Open navigation menu" aria-expanded="false">
         <i class="fa-solid fa-bars"></i>
       </button>
       <div class="header-info">
@@ -155,7 +155,7 @@
     <div class="input-area">
       <div class="suggestion-strip" id="quickSuggestions" aria-label="Suggested prompts"></div>
       <div class="input-row">
-        <button class="quiz-btn" id="quizBtn">
+        <button class="quiz-btn" id="quizBtn" type="button">
           <i class="fa-solid fa-bolt"></i> Quiz me
         </button>
         <input
@@ -165,7 +165,7 @@
           placeholder="Ask a question or type a topic..."
           autocomplete="off"
         />
-        <button class="send-btn" id="sendBtn">
+        <button class="send-btn" id="sendBtn" type="button" aria-label="Send message">
           <i class="fa-solid fa-paper-plane"></i>
         </button>
       </div>
