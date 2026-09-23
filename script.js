@@ -55,9 +55,13 @@ const subjectReplies = {
 };
 
 function setActiveSubject(subject, button) {
-  subjectBtns.forEach((btn) => btn.classList.remove('active'));
+  subjectBtns.forEach((btn) => {
+    btn.classList.remove('active');
+    btn.setAttribute('aria-pressed', 'false');
+  });
   if (button) {
     button.classList.add('active');
+    button.setAttribute('aria-pressed', 'true');
   }
 
   activeSubject = subject;
