@@ -365,7 +365,10 @@ clearBtn.addEventListener('click', () => {
   updateSuggestionChips();
 });
 
-menuToggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+menuToggle.addEventListener('click', () => {
+  const isOpen = sidebar.classList.toggle('open');
+  menuToggle.setAttribute('aria-expanded', isOpen.toString());
+});
 
 themeToggle?.addEventListener('click', () => {
   const nextTheme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
