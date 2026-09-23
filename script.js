@@ -359,6 +359,9 @@ quizBtn.addEventListener('click', () => {
 });
 
 clearBtn.addEventListener('click', () => {
+  if (chatHistory.length && !window.confirm('Clear this study conversation?')) {
+    return;
+  }
   chatHistory = [];
   saveChatHistory();
   showEmptyState();
