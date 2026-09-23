@@ -16,6 +16,8 @@ A polished MBA study assistant chatbot UI with subject-based shortcuts, quick pr
 * 📤 Export saved notes as JSON (keyboard: Ctrl/Cmd+E)
 * 🧠 Quick-study prompts for fast revision sessions
 * 📝 Save study notes from recent chat topics for quick revision
+* ♿ Keyboard-friendly controls with visible focus states and accessible menu labels
+* 🔒 Escaped dynamic chat content and guarded local-history persistence
 
 
 ## 📁 Project Structure
