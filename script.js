@@ -137,7 +137,11 @@ function initializeTheme() {
 }
 
 function saveChatHistory() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(chatHistory));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(chatHistory));
+  } catch (error) {
+    showToast('Chat could not be saved in this browser');
+  }
   if (saveStatus) {
     saveStatus.textContent = 'Autosaved';
   }
