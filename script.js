@@ -147,6 +147,12 @@ function showToast(message) {
   showToast.timeoutId = setTimeout(() => toast.classList.remove('show'), 2200);
 }
 
+function escapeHtml(value) {
+  const container = document.createElement('div');
+  container.textContent = value;
+  return container.innerHTML;
+}
+
 function loadSavedNotes() {
   try {
     const stored = localStorage.getItem(NOTES_STORAGE_KEY);
@@ -168,11 +174,11 @@ function renderNotes() {
     .map((note) => `
       <article class="note-card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-          <strong>${note.subject}</strong>
+          <strong>${escapeHtml(note.subject)}</strong>
           <button class="note-delete" data-id="${note.id}" aria-label="Delete note">✕</button>
         </div>
-        <span>${note.createdAt}</span>
-        <p>${note.title}</p>
+        <span>${escapeHtml(note.createdAt)}</span>
+        <p>${escapeHtml(note.title)}</p>
       </article>
     `)
     .join('');
@@ -293,11 +299,12 @@ function addMessage(text, role, persist = true) {
   div.className = 'msg ' + (role === 'bot' ? 'bot-msg' : 'user-msg');
 
   const timestamp = `<span class="msg-time">${formatTime()}</span>`;
+  const safeText = escapeHtml(text);
 
   if (role === 'bot') {
-    div.innerHTML = `<div class="msg-avatar"><i class="fa-solid fa-robot"></i></div><div class="msg-bubble">${text}<div class="msg-meta">${timestamp}</div></div>`;
+    div.innerHTML = `<div class="msg-avatar"><i class="fa-solid fa-robot"></i></div><div class="msg-bubble">${safeText}<div class="msg-meta">${timestamp}</div></div>`;
   } else {
-    div.innerHTML = `<div class="msg-bubble">${text}<div class="msg-meta">${timestamp}</div></div>`;
+    div.innerHTML = `<div class="msg-bubble">${safeText}<div class="msg-meta">${timestamp}</div></div>`;
   }
 
   messages.appendChild(div);
