@@ -26,6 +26,7 @@ const NOTES_STORAGE_KEY = 'mba-buddy-saved-notes';
 let activeSubject = 'finance';
 let chatHistory = [];
 let savedNotes = [];
+const pendingReplyTimers = new Set();
 
 function readStorage(key) {
   try {
@@ -339,30 +340,37 @@ function sendMessage(text) {
   const value = text.trim();
   if (!value) return;
 
+  const subjectAtSend = activeSubject;
   addMessage(value, 'user', true);
   userInput.value = '';
-  showTyping();
+  if (!pendingReplyTimers.size) {
+    showTyping();
+  }
 
-  setTimeout(() => {
-    removeTyping();
-    const reply = getBotReply(value);
+  const timer = setTimeout(() => {
+    pendingReplyTimers.delete(timer);
+    if (!pendingReplyTimers.size) {
+      removeTyping();
+    }
+    const reply = getBotReply(value, subjectAtSend);
     addMessage(reply, 'bot', true);
   }, 1000);
+  pendingReplyTimers.add(timer);
 }
 
-function getBotReply(userText) {
+function getBotReply(userText, subject = activeSubject) {
   const lowerText = userText.toLowerCase();
-  const label = activeSubject.charAt(0).toUpperCase() + activeSubject.slice(1);
+  const label = subject.charAt(0).toUpperCase() + subject.slice(1);
 
   if (lowerText.includes('quiz')) {
-    return `${subjectReplies[activeSubject].quiz} (${label})`;
+    return `${subjectReplies[subject].quiz} (${label})`;
   }
 
   if (lowerText.includes('tip') || lowerText.includes('revision')) {
-    return subjectReplies[activeSubject].tip;
+    return subjectReplies[subject].tip;
   }
 
-  return subjectReplies[activeSubject].default;
+  return subjectReplies[subject].default;
 }
 
 function formatTime() {
@@ -437,6 +445,9 @@ clearBtn.addEventListener('click', () => {
   if (chatHistory.length && !window.confirm('Clear this study conversation?')) {
     return;
   }
+  pendingReplyTimers.forEach((timer) => clearTimeout(timer));
+  pendingReplyTimers.clear();
+  removeTyping();
   chatHistory = [];
   saveChatHistory();
   showEmptyState();
