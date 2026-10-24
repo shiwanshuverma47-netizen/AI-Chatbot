@@ -388,16 +388,12 @@ saveNoteBtn?.addEventListener('click', saveCurrentNote);
 // keyboard shortcut: Ctrl/Cmd+E to export notes
 document.addEventListener('keydown', (event) => {
   const key = event.key.toLowerCase();
-  if ((event.ctrlKey || event.metaKey) && key === 'e') {
+  const target = event.target;
+  const isEditing = target instanceof HTMLElement
+    && (target.isContentEditable || target.matches('input, textarea, select'));
+  if ((event.ctrlKey || event.metaKey) && key === 'e' && !isEditing && !event.repeat) {
     event.preventDefault();
     exportNotes();
-  }
-});
-
-themeToggle?.addEventListener('keydown', (event) => {
-  if (event.key === 'Enter' || event.key === ' ') {
-    event.preventDefault();
-    themeToggle.click();
   }
 });
 
