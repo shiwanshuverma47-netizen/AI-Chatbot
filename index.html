@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="A browser-based study assistant demo for MBA Finance, Marketing, HR, and Operations topics." />
   <title>MBA Buddy – Your Smart Study Assistant</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
@@ -10,7 +11,7 @@
 <body>
 
   <!-- ===== SIDEBAR ===== -->
-  <aside class="sidebar">
+  <aside class="sidebar" aria-label="Study navigation">
 
     <!-- Brand -->
     <div class="sidebar-brand">
@@ -96,7 +97,7 @@
         <div>
           <p class="header-name">MBA Buddy</p>
           <p class="header-status">
-            <span class="status-dot"></span>Online — ask me anything
+            <span class="status-dot"></span>Study prompts ready
           </p>
         </div>
       </div>
@@ -115,7 +116,7 @@
           </button>
         <div class="assistant-pill">
           <i class="fa-solid fa-robot"></i>
-          <span>AI Assistant</span>
+          <span>Study assistant</span>
         </div>
         <div class="header-badge" id="activeBadge">Finance</div>
         <div class="header-badge saved-badge" id="saveStatus">Autosaved</div>
@@ -132,7 +133,7 @@
     </section>
 
     <!-- Messages -->
-    <div class="messages" id="messages">
+    <div class="messages" id="messages" role="log" aria-label="Chat conversation" aria-live="polite" aria-relevant="additions text">
 
       <!-- Welcome message -->
       <div class="msg bot-msg">
@@ -153,17 +154,19 @@
 
     <!-- Input area -->
     <div class="input-area">
-      <div class="suggestion-strip" id="quickSuggestions" aria-label="Suggested prompts"></div>
+      <div class="suggestion-strip" id="quickSuggestions" role="group" aria-label="Suggested prompts"></div>
       <div class="input-row">
         <button class="quiz-btn" id="quizBtn" type="button">
           <i class="fa-solid fa-bolt"></i> Quiz me
         </button>
+        <label class="visually-hidden" for="userInput">Ask a study question</label>
         <input
           type="text"
           id="userInput"
           class="chat-input"
           placeholder="Ask a question or type a topic..."
           autocomplete="off"
+          maxlength="500"
         />
         <button class="send-btn" id="sendBtn" type="button" aria-label="Send message">
           <i class="fa-solid fa-paper-plane"></i>
