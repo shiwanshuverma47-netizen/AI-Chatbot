@@ -80,6 +80,7 @@ body {
   background: var(--bg-app);
   display: flex;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   color: var(--text-dark);
   transition: background var(--transition), color var(--transition);
@@ -754,4 +755,43 @@ body {
   background: #e6f6ff;
   color: #055160;
 }
+.export-notes-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
 .export-notes-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+@media (max-width: 480px) {
+  .chat-header {
+    align-items: flex-start;
+    padding: 12px;
+  }
+  .header-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .assistant-pill,
+  .mode-pill {
+    display: none;
+  }
+  .focus-strip {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 10px 14px;
+  }
+  .input-area {
+    padding: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
