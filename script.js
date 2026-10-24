@@ -78,6 +78,16 @@ function setActiveSubject(subject, button) {
   updateSuggestionChips();
 }
 
+function closeSidebar(restoreFocus = false) {
+  const wasOpen = sidebar.classList.contains('open');
+  sidebar.classList.remove('open');
+  menuToggle.setAttribute('aria-expanded', 'false');
+  menuToggle.setAttribute('aria-label', 'Open navigation menu');
+  if (restoreFocus && wasOpen) {
+    menuToggle.focus();
+  }
+}
+
 function updateFocusStrip() {
   if (!focusCopy) return;
   const currentSubject = subjectReplies[activeSubject] || subjectReplies.finance;
@@ -341,6 +351,9 @@ function removeTyping() {
 subjectBtns.forEach((btn) => {
   btn.addEventListener('click', () => {
     setActiveSubject(btn.dataset.subject, btn);
+    if (window.matchMedia('(max-width: 700px)').matches) {
+      closeSidebar();
+    }
   });
 });
 
@@ -348,6 +361,7 @@ topicChips.forEach((chip) => {
   chip.addEventListener('click', () => {
     userInput.value = chip.textContent.trim();
     userInput.focus();
+    closeSidebar();
   });
 });
 
@@ -375,6 +389,21 @@ clearBtn.addEventListener('click', () => {
 menuToggle.addEventListener('click', () => {
   const isOpen = sidebar.classList.toggle('open');
   menuToggle.setAttribute('aria-expanded', isOpen.toString());
+  menuToggle.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+});
+
+document.addEventListener('click', (event) => {
+  if (sidebar.classList.contains('open')
+    && !sidebar.contains(event.target)
+    && !menuToggle.contains(event.target)) {
+    closeSidebar();
+  }
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && sidebar.classList.contains('open')) {
+    closeSidebar(true);
+  }
 });
 
 themeToggle?.addEventListener('click', () => {
