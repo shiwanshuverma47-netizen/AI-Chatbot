@@ -27,6 +27,25 @@ let activeSubject = 'finance';
 let chatHistory = [];
 let savedNotes = [];
 
+function readStorage(key) {
+  try {
+    return localStorage.getItem(key);
+  } catch (error) {
+    showToast('Browser storage is unavailable');
+    return null;
+  }
+}
+
+function writeStorage(key, value) {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (error) {
+    showToast('Changes could not be saved in this browser');
+    return false;
+  }
+}
+
 const subjectReplies = {
   finance: {
     quiz: 'Quick finance quiz: What is the main difference between NPV and IRR?',
@@ -65,7 +84,7 @@ function setActiveSubject(subject, button) {
   }
 
   activeSubject = subject;
-  localStorage.setItem(SUBJECT_STORAGE_KEY, subject);
+  writeStorage(SUBJECT_STORAGE_KEY, subject);
   activeBadge.textContent = button?.dataset.label || subject.charAt(0).toUpperCase() + subject.slice(1);
 
   document.querySelectorAll('.topic-group').forEach((group) => group.classList.add('hidden'));
@@ -116,7 +135,7 @@ function updateSuggestionChips() {
 
 function loadChatHistory() {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+    const stored = readStorage(STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
   } catch (error) {
     return [];
@@ -139,7 +158,7 @@ function applyTheme(theme) {
 }
 
 function initializeTheme() {
-  const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+  const savedTheme = readStorage(THEME_STORAGE_KEY);
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const defaultTheme = window.MBA_BUDDY_CONFIG?.defaultTheme || 'light';
   const theme = savedTheme || (prefersDark ? 'dark' : defaultTheme);
@@ -147,13 +166,9 @@ function initializeTheme() {
 }
 
 function saveChatHistory() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(chatHistory));
-  } catch (error) {
-    showToast('Chat could not be saved in this browser');
-  }
+  const saved = writeStorage(STORAGE_KEY, JSON.stringify(chatHistory));
   if (saveStatus) {
-    saveStatus.textContent = 'Autosaved';
+    saveStatus.textContent = saved ? 'Autosaved' : 'Not saved';
   }
 }
 
@@ -173,7 +188,7 @@ function escapeHtml(value) {
 
 function loadSavedNotes() {
   try {
-    const stored = localStorage.getItem(NOTES_STORAGE_KEY);
+    const stored = readStorage(NOTES_STORAGE_KEY);
     return stored ? JSON.parse(stored) : [];
   } catch (error) {
     return [];
@@ -205,8 +220,9 @@ function renderNotes() {
     button.addEventListener('click', (event) => {
       event.stopPropagation();
       const id = button.getAttribute('data-id');
-      savedNotes = savedNotes.filter((note) => note.id !== id);
-      localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(savedNotes));
+      const nextNotes = savedNotes.filter((note) => note.id !== id);
+      if (!writeStorage(NOTES_STORAGE_KEY, JSON.stringify(nextNotes))) return;
+      savedNotes = nextNotes;
       renderNotes();
       showToast('Note removed');
     });
@@ -258,8 +274,9 @@ function saveCurrentNote() {
     content: latestBotEntry ? latestBotEntry.text : subjectReplies[activeSubject].default
   };
 
-  savedNotes = [note, ...savedNotes].slice(0, 5);
-  localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(savedNotes));
+  const nextNotes = [note, ...savedNotes].slice(0, 5);
+  if (!writeStorage(NOTES_STORAGE_KEY, JSON.stringify(nextNotes))) return;
+  savedNotes = nextNotes;
   renderNotes();
   showToast('Study note saved');
 }
@@ -408,7 +425,7 @@ document.addEventListener('keydown', (event) => {
 
 themeToggle?.addEventListener('click', () => {
   const nextTheme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+  writeStorage(THEME_STORAGE_KEY, nextTheme);
   applyTheme(nextTheme);
 });
 
@@ -437,7 +454,7 @@ if (chatHistory.length) {
   updateSuggestionChips();
 }
 
-const savedSubject = localStorage.getItem(SUBJECT_STORAGE_KEY);
+const savedSubject = readStorage(SUBJECT_STORAGE_KEY);
 const initialButton = savedSubject
   ? document.querySelector(`.subject-btn[data-subject="${savedSubject}"]`)
   : document.querySelector('.subject-btn.active');
