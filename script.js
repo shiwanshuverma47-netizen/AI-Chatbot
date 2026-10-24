@@ -74,6 +74,11 @@ const subjectReplies = {
 };
 
 function setActiveSubject(subject, button) {
+  if (!Object.prototype.hasOwnProperty.call(subjectReplies, subject)) {
+    subject = 'finance';
+    button = document.querySelector('.subject-btn[data-subject="finance"]');
+  }
+
   subjectBtns.forEach((btn) => {
     btn.classList.remove('active');
     btn.setAttribute('aria-pressed', 'false');
@@ -136,8 +141,23 @@ function updateSuggestionChips() {
 function loadChatHistory() {
   try {
     const stored = readStorage(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
+    if (!stored) return [];
+    const history = JSON.parse(stored);
+    if (!Array.isArray(history)) {
+      showToast('Saved chat data was invalid and was ignored');
+      return [];
+    }
+    const validEntries = history.filter((entry) =>
+      entry
+      && typeof entry.text === 'string'
+      && (entry.role === 'user' || entry.role === 'bot')
+    );
+    if (validEntries.length !== history.length) {
+      showToast('Some saved chat messages were invalid and skipped');
+    }
+    return validEntries.slice(-100);
   } catch (error) {
+    showToast('Saved chat data could not be read');
     return [];
   }
 }
@@ -161,7 +181,9 @@ function initializeTheme() {
   const savedTheme = readStorage(THEME_STORAGE_KEY);
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
   const defaultTheme = window.MBA_BUDDY_CONFIG?.defaultTheme || 'light';
-  const theme = savedTheme || (prefersDark ? 'dark' : defaultTheme);
+  const theme = savedTheme === 'light' || savedTheme === 'dark'
+    ? savedTheme
+    : (prefersDark ? 'dark' : defaultTheme);
   applyTheme(theme);
 }
 
@@ -189,8 +211,26 @@ function escapeHtml(value) {
 function loadSavedNotes() {
   try {
     const stored = readStorage(NOTES_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
+    if (!stored) return [];
+    const notes = JSON.parse(stored);
+    if (!Array.isArray(notes)) {
+      showToast('Saved notes data was invalid and was ignored');
+      return [];
+    }
+    const validNotes = notes.filter((note) =>
+      note
+      && typeof note.id === 'string'
+      && typeof note.subject === 'string'
+      && typeof note.createdAt === 'string'
+      && typeof note.title === 'string'
+      && typeof note.content === 'string'
+    );
+    if (validNotes.length !== notes.length) {
+      showToast('Some saved notes were invalid and skipped');
+    }
+    return validNotes.slice(0, 5);
   } catch (error) {
+    showToast('Saved notes data could not be read');
     return [];
   }
 }
@@ -455,7 +495,8 @@ if (chatHistory.length) {
 }
 
 const savedSubject = readStorage(SUBJECT_STORAGE_KEY);
-const initialButton = savedSubject
-  ? document.querySelector(`.subject-btn[data-subject="${savedSubject}"]`)
+const isKnownSubject = Object.prototype.hasOwnProperty.call(subjectReplies, savedSubject);
+const initialButton = isKnownSubject
+  ? Array.from(subjectBtns).find((button) => button.dataset.subject === savedSubject)
   : document.querySelector('.subject-btn.active');
-setActiveSubject(savedSubject || activeSubject, initialButton || document.querySelector('.subject-btn.active'));
+setActiveSubject(isKnownSubject ? savedSubject : activeSubject, initialButton || document.querySelector('.subject-btn.active'));
