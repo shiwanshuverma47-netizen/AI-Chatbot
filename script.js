@@ -15,6 +15,7 @@ const quickSuggestions = document.getElementById('quickSuggestions');
 const themeToggle = document.getElementById('themeToggle');
 const saveNoteBtn = document.getElementById('saveNoteBtn');
 const exportNotesBtn = document.getElementById('exportNotesBtn');
+const exportChatBtn = document.getElementById('exportChatBtn');
 const notesPanel = document.getElementById('notesPanel');
 const toast = document.getElementById('toast');
 const focusCopy = document.getElementById('focusCopy');
@@ -440,10 +441,35 @@ function updateExportButtonState() {
   exportNotesBtn.setAttribute('aria-disabled', (!has).toString());
 }
 
+function updateExportChatButtonState() {
+  if (!exportChatBtn) return;
+  exportChatBtn.disabled = chatHistory.length === 0;
+  exportChatBtn.setAttribute('aria-disabled', exportChatBtn.disabled.toString());
+}
+
 function exportNotes() {
   if (!savedNotes || !savedNotes.length) {
     showToast('No notes to export');
     return;
+  }
+
+  function exportChatHistory() {
+    if (!chatHistory.length) {
+      showToast('No chat messages to export');
+      return;
+    }
+
+    const data = JSON.stringify(chatHistory, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `mba-buddy-chat-${new Date().toISOString().slice(0, 10)}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    showToast(`Exported ${chatHistory.length} chat message${chatHistory.length === 1 ? '' : 's'}`);
   }
 
   const data = JSON.stringify(savedNotes, null, 2);
@@ -568,6 +594,7 @@ function addMessage(text, role, persist = true) {
   if (persist) {
     chatHistory.push({ text, role });
     saveChatHistory();
+    updateExportChatButtonState();
   }
 }
 
@@ -623,6 +650,7 @@ clearBtn.addEventListener('click', () => {
   activeQuiz = null;
   chatHistory = [];
   saveChatHistory();
+  updateExportChatButtonState();
   showEmptyState();
   updateSuggestionChips();
 });
@@ -654,6 +682,7 @@ themeToggle?.addEventListener('click', () => {
 });
 
 saveNoteBtn?.addEventListener('click', saveCurrentNote);
+exportChatBtn?.addEventListener('click', exportChatHistory);
 
 // keyboard shortcut: Ctrl/Cmd+E to export notes
 document.addEventListener('keydown', (event) => {
@@ -672,6 +701,7 @@ chatHistory = loadChatHistory();
 savedNotes = loadSavedNotes();
 renderNotes();
 updateExportButtonState();
+updateExportChatButtonState();
 if (chatHistory.length) {
   renderChatHistory();
 } else {
