@@ -239,6 +239,19 @@ body {
   font-size: 11px;
   line-height: 1.45;
 }
+.note-details {
+  color: var(--gray-300);
+  font-size: 11px;
+  line-height: 1.45;
+}
+.note-details summary {
+  color: var(--gold-light);
+  cursor: pointer;
+  font-weight: 600;
+}
+.note-details p {
+  margin-top: 6px;
+}
 .note-delete {
   align-self: flex-end;
   background: transparent;

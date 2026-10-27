@@ -416,6 +416,10 @@ function renderNotes() {
         </div>
         <span>${escapeHtml(note.createdAt)}</span>
         <p>${escapeHtml(note.title)}</p>
+        <details class="note-details">
+          <summary>View response summary</summary>
+          <p>${escapeHtml(note.content)}</p>
+        </details>
       </article>
     `)
     .join('');
