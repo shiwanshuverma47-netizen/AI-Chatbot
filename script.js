@@ -583,7 +583,8 @@ function addMessage(text, role, persist = true) {
   const safeText = escapeHtml(text);
 
   if (role === 'bot') {
-    div.innerHTML = `<div class="msg-avatar"><i class="fa-solid fa-robot"></i></div><div class="msg-bubble">${safeText}<div class="msg-meta">${timestamp}</div></div>`;
+    div.innerHTML = `<div class="msg-avatar"><i class="fa-solid fa-robot"></i></div><div class="msg-bubble">${safeText}<div class="msg-meta">${timestamp}<button class="copy-message" type="button" aria-label="Copy assistant response"><i class="fa-regular fa-copy" aria-hidden="true"></i><span>Copy</span></button></div></div>`;
+    div.querySelector('.copy-message').dataset.message = text;
   } else {
     div.innerHTML = `<div class="msg-bubble">${safeText}<div class="msg-meta">${timestamp}</div></div>`;
   }
@@ -597,6 +598,22 @@ function addMessage(text, role, persist = true) {
     updateExportChatButtonState();
   }
 }
+
+messages.addEventListener('click', async (event) => {
+  if (!(event.target instanceof Element)) return;
+  const copyButton = event.target.closest('.copy-message');
+  if (!copyButton) return;
+
+  const message = copyButton.dataset.message;
+  if (!message) return;
+
+  try {
+    await navigator.clipboard.writeText(message);
+    showToast('Response copied');
+  } catch (error) {
+    showToast('Could not access the clipboard; check browser permissions');
+  }
+});
 
 function showTyping() {
   const div = document.createElement('div');

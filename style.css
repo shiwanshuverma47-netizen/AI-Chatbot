@@ -500,6 +500,25 @@ body {
   font-size: 11px;
   opacity: 0.7;
   text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+.copy-message {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: inherit;
+  font-size: 11px;
+  opacity: 0.8;
+}
+.copy-message:hover {
+  opacity: 1;
+  background: var(--surface-soft);
 }
 .empty-state {
   padding: 16px;
