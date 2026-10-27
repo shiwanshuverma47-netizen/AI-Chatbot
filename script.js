@@ -19,6 +19,8 @@ const exportChatBtn = document.getElementById('exportChatBtn');
 const notesPanel = document.getElementById('notesPanel');
 const toast = document.getElementById('toast');
 const focusCopy = document.getElementById('focusCopy');
+const historySearch = document.getElementById('historySearch');
+const searchStatus = document.getElementById('searchStatus');
 
 const STORAGE_KEY = 'mba-buddy-chat-history';
 const THEME_STORAGE_KEY = window.MBA_BUDDY_CONFIG?.themeKey || 'mba-buddy-theme';
@@ -516,6 +518,7 @@ function saveCurrentNote() {
 
 function showEmptyState() {
   messages.innerHTML = '<div class="empty-state">Start a conversation to save your study notes here.</div>';
+  applyHistorySearch();
 }
 
 function renderChatHistory() {
@@ -526,6 +529,25 @@ function renderChatHistory() {
   }
   chatHistory.forEach((entry) => addMessage(entry.text, entry.role, false));
   messages.scrollTop = messages.scrollHeight;
+  applyHistorySearch();
+}
+
+function applyHistorySearch() {
+  if (!historySearch || !searchStatus) return;
+  const query = historySearch.value.trim().toLocaleLowerCase();
+  const messageElements = messages.querySelectorAll('.msg[data-chat-message="true"]');
+  let visibleCount = 0;
+
+  messageElements.forEach((message) => {
+    const matches = !query || message.textContent.toLocaleLowerCase().includes(query);
+    message.hidden = !matches;
+    if (matches) visibleCount += 1;
+  });
+
+  searchStatus.hidden = !query;
+  searchStatus.textContent = query
+    ? (visibleCount ? `${visibleCount} matching message${visibleCount === 1 ? '' : 's'}` : 'No matching messages')
+    : '';
 }
 
 function sendMessage(text) {
@@ -582,6 +604,7 @@ function formatTime() {
 function addMessage(text, role, persist = true) {
   const div = document.createElement('div');
   div.className = 'msg ' + (role === 'bot' ? 'bot-msg' : 'user-msg');
+  div.dataset.chatMessage = 'true';
 
   const timestamp = `<span class="msg-time">${formatTime()}</span>`;
   const safeText = escapeHtml(text);
@@ -595,6 +618,7 @@ function addMessage(text, role, persist = true) {
 
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
+  applyHistorySearch();
 
   if (persist) {
     chatHistory.push({ text, role });
@@ -656,6 +680,7 @@ userInput.addEventListener('keydown', (event) => {
     sendMessage(userInput.value);
   }
 });
+historySearch?.addEventListener('input', applyHistorySearch);
 
 quizBtn.addEventListener('click', () => {
   sendMessage(`Quiz me on ${activeSubject.charAt(0).toUpperCase() + activeSubject.slice(1)}`);

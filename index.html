@@ -158,6 +158,15 @@
 
     <!-- Input area -->
     <div class="input-area">
+      <label class="visually-hidden" for="historySearch">Search this conversation</label>
+      <input
+        type="search"
+        id="historySearch"
+        class="history-search"
+        placeholder="Search this conversation..."
+        autocomplete="off"
+      />
+      <p class="search-status" id="searchStatus" role="status" aria-live="polite" hidden></p>
       <div class="suggestion-strip" id="quickSuggestions" role="group" aria-label="Suggested prompts"></div>
       <div class="input-row">
         <button class="quiz-btn" id="quizBtn" type="button">
