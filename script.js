@@ -321,7 +321,13 @@ function loadChatHistory() {
     if (validEntries.length !== history.length) {
       showToast('Some saved chat messages were invalid and skipped');
     }
-    return validEntries.slice(-100);
+    return validEntries.slice(-100).map((entry) => ({
+      ...entry,
+      timestamp: typeof entry.timestamp === 'string'
+        && !Number.isNaN(new Date(entry.timestamp).getTime())
+        ? entry.timestamp
+        : new Date().toISOString()
+    }));
   } catch (error) {
     showToast('Saved chat data could not be read');
     return [];
@@ -527,7 +533,7 @@ function renderChatHistory() {
     showEmptyState();
     return;
   }
-  chatHistory.forEach((entry) => addMessage(entry.text, entry.role, false));
+  chatHistory.forEach((entry) => addMessage(entry.text, entry.role, false, entry.timestamp));
   messages.scrollTop = messages.scrollHeight;
   applyHistorySearch();
 }
@@ -597,23 +603,24 @@ function getBotReply(userText, subject = activeSubject) {
   return subjectReplies[subject].default;
 }
 
-function formatTime() {
-  return new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+function formatTime(timestamp) {
+  const date = new Date(timestamp);
+  return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
-function addMessage(text, role, persist = true) {
+function addMessage(text, role, persist = true, timestamp = new Date().toISOString()) {
   const div = document.createElement('div');
   div.className = 'msg ' + (role === 'bot' ? 'bot-msg' : 'user-msg');
   div.dataset.chatMessage = 'true';
 
-  const timestamp = `<span class="msg-time">${formatTime()}</span>`;
+  const timeMarkup = `<time class="msg-time" datetime="${escapeHtml(timestamp)}">${formatTime(timestamp)}</time>`;
   const safeText = escapeHtml(text);
 
   if (role === 'bot') {
-    div.innerHTML = `<div class="msg-avatar"><i class="fa-solid fa-robot"></i></div><div class="msg-bubble">${safeText}<div class="msg-meta">${timestamp}<button class="copy-message" type="button" aria-label="Copy assistant response"><i class="fa-regular fa-copy" aria-hidden="true"></i><span>Copy</span></button></div></div>`;
+    div.innerHTML = `<div class="msg-avatar"><i class="fa-solid fa-robot"></i></div><div class="msg-bubble">${safeText}<div class="msg-meta">${timeMarkup}<button class="copy-message" type="button" aria-label="Copy assistant response"><i class="fa-regular fa-copy" aria-hidden="true"></i><span>Copy</span></button></div></div>`;
     div.querySelector('.copy-message').dataset.message = text;
   } else {
-    div.innerHTML = `<div class="msg-bubble">${safeText}<div class="msg-meta">${timestamp}</div></div>`;
+    div.innerHTML = `<div class="msg-bubble">${safeText}<div class="msg-meta">${timeMarkup}</div></div>`;
   }
 
   messages.appendChild(div);
@@ -621,7 +628,7 @@ function addMessage(text, role, persist = true) {
   applyHistorySearch();
 
   if (persist) {
-    chatHistory.push({ text, role });
+    chatHistory.push({ text, role, timestamp });
     saveChatHistory();
     updateExportChatButtonState();
   }
