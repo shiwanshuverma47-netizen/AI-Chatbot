@@ -8,8 +8,10 @@ prompts in `script.js`.
 ## Features
 
 - Subject-specific quick topics, suggestions, and quiz prompts
+- Topic-focused study explanations and scored, multi-question quizzes
 - Locally saved chat history, study notes, and theme preference
-- Export saved notes as JSON (Ctrl/Cmd+E)
+- Search chat history and copy assistant responses
+- Export chat history and export or import notes as JSON
 - Responsive layout with light and dark themes
 - Keyboard-accessible controls and visible focus indicators
 
@@ -37,7 +39,9 @@ Then visit <http://localhost:8000>.
 
 Chat history, saved notes, and the selected theme are stored in the browser's
 `localStorage`. They remain on the current browser profile and are not synced
-to a server. Clearing browser site data removes them.
+to a server. Notes can be exported to or imported from a JSON backup; imports
+are validated, merged by note ID, and limited to the five most recent notes.
+Clearing browser site data removes locally saved data.
 
 ## Contributing
 

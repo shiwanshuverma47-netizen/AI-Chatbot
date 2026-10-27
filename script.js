@@ -16,6 +16,8 @@ const themeToggle = document.getElementById('themeToggle');
 const saveNoteBtn = document.getElementById('saveNoteBtn');
 const exportNotesBtn = document.getElementById('exportNotesBtn');
 const exportChatBtn = document.getElementById('exportChatBtn');
+const importNotesBtn = document.getElementById('importNotesBtn');
+const importNotesFile = document.getElementById('importNotesFile');
 const notesPanel = document.getElementById('notesPanel');
 const toast = document.getElementById('toast');
 const focusCopy = document.getElementById('focusCopy');
@@ -380,6 +382,15 @@ function escapeHtml(value) {
   return container.innerHTML;
 }
 
+function isValidSavedNote(note) {
+  return note
+    && typeof note.id === 'string'
+    && typeof note.subject === 'string'
+    && typeof note.createdAt === 'string'
+    && typeof note.title === 'string'
+    && typeof note.content === 'string';
+}
+
 function loadSavedNotes() {
   try {
     const stored = readStorage(NOTES_STORAGE_KEY);
@@ -389,14 +400,7 @@ function loadSavedNotes() {
       showToast('Saved notes data was invalid and was ignored');
       return [];
     }
-    const validNotes = notes.filter((note) =>
-      note
-      && typeof note.id === 'string'
-      && typeof note.subject === 'string'
-      && typeof note.createdAt === 'string'
-      && typeof note.title === 'string'
-      && typeof note.content === 'string'
-    );
+    const validNotes = notes.filter(isValidSavedNote);
     if (validNotes.length !== notes.length) {
       showToast('Some saved notes were invalid and skipped');
     }
@@ -469,6 +473,57 @@ function exportNotes() {
     if (!chatHistory.length) {
       showToast('No chat messages to export');
       return;
+    }
+
+    async function importSavedNotes(file) {
+      if (file.size > 1024 * 1024) {
+        showToast('Notes backup is too large (maximum 1 MB)');
+        return;
+      }
+
+      let importedNotes;
+      let invalidCount = 0;
+      try {
+        const parsed = JSON.parse(await file.text());
+        if (!Array.isArray(parsed)) {
+          showToast('Notes backup must contain a JSON array');
+          return;
+        }
+        importedNotes = parsed.filter(isValidSavedNote);
+        invalidCount = parsed.length - importedNotes.length;
+      } catch (error) {
+        showToast('Could not read notes backup; check that it is valid JSON');
+        return;
+      }
+
+      if (!importedNotes.length) {
+        showToast('No valid notes were found in this backup');
+        return;
+      }
+
+      const seenIds = new Set();
+      const mergedNotes = [...importedNotes, ...savedNotes].filter((note) => {
+        if (seenIds.has(note.id)) return false;
+        seenIds.add(note.id);
+        return true;
+      }).slice(0, 5);
+
+      if (mergedNotes.length === savedNotes.length
+        && mergedNotes.every((note, index) => note.id === savedNotes[index]?.id)) {
+        showToast(invalidCount
+          ? `These notes are already saved; skipped ${invalidCount} invalid entr${invalidCount === 1 ? 'y' : 'ies'}`
+          : 'These notes are already saved');
+        return;
+      }
+
+      if (!writeStorage(NOTES_STORAGE_KEY, JSON.stringify(mergedNotes))) return;
+      const addedCount = mergedNotes.filter((note) => !savedNotes.some((saved) => saved.id === note.id)).length;
+      savedNotes = mergedNotes;
+      renderNotes();
+      const skippedMessage = invalidCount
+        ? `; skipped ${invalidCount} invalid entr${invalidCount === 1 ? 'y' : 'ies'}`
+        : '';
+      showToast(`Imported ${addedCount} note${addedCount === 1 ? '' : 's'}${skippedMessage} (up to 5 are kept)`);
     }
 
     const data = JSON.stringify(chatHistory, null, 2);
@@ -736,6 +791,13 @@ themeToggle?.addEventListener('click', () => {
 
 saveNoteBtn?.addEventListener('click', saveCurrentNote);
 exportChatBtn?.addEventListener('click', exportChatHistory);
+importNotesBtn?.addEventListener('click', () => importNotesFile?.click());
+importNotesFile?.addEventListener('change', async () => {
+  const file = importNotesFile.files?.[0];
+  if (!file) return;
+  await importSavedNotes(file);
+  importNotesFile.value = '';
+});
 
 // keyboard shortcut: Ctrl/Cmd+E to export notes
 document.addEventListener('keydown', (event) => {

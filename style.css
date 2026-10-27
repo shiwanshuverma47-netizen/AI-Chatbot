@@ -789,7 +789,8 @@ body {
   }
 }
 .export-notes-btn,
-.export-chat-btn {
+.export-chat-btn,
+.import-notes-btn {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -803,7 +804,8 @@ body {
   transition: transform var(--transition), background var(--transition), color var(--transition);
 }
 .export-notes-btn:hover:not(:disabled),
-.export-chat-btn:hover:not(:disabled) {
+.export-chat-btn:hover:not(:disabled),
+.import-notes-btn:hover {
   transform: translateY(-1px);
   background: #e6f6ff;
   color: #055160;
@@ -815,7 +817,8 @@ body {
   transform: none;
 }
 .export-notes-btn:focus-visible,
-.export-chat-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.export-chat-btn:focus-visible,
+.import-notes-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
 @media (max-width: 480px) {
   .chat-header {

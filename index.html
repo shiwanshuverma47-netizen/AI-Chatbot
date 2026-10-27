@@ -114,6 +114,11 @@
           <i class="fa-solid fa-file-export"></i>
           <span>Export notes</span>
         </button>
+        <button class="import-notes-btn" id="importNotesBtn" type="button" aria-label="Import saved notes" title="Import notes from a JSON backup">
+          <i class="fa-solid fa-file-import"></i>
+          <span>Import notes</span>
+        </button>
+        <input class="visually-hidden" id="importNotesFile" type="file" accept="application/json,.json" tabindex="-1" aria-hidden="true" />
         <button class="export-chat-btn" id="exportChatBtn" type="button" aria-label="Export chat conversation" title="Download this conversation as JSON" disabled>
           <i class="fa-solid fa-download"></i>
           <span>Export chat</span>
