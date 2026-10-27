@@ -416,6 +416,7 @@ function renderNotes() {
 
   if (!savedNotes.length) {
     notesPanel.innerHTML = '<div class="note-empty">Save a topic summary to keep revision points for later.</div>';
+    updateExportButtonState();
     return;
   }
 
@@ -424,7 +425,7 @@ function renderNotes() {
       <article class="note-card">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
           <strong>${escapeHtml(note.subject)}</strong>
-          <button class="note-delete" data-id="${note.id}" aria-label="Delete note">✕</button>
+          <button class="note-delete" data-id="${escapeHtml(note.id)}" aria-label="Delete note">✕</button>
         </div>
         <span>${escapeHtml(note.createdAt)}</span>
         <p>${escapeHtml(note.title)}</p>
@@ -469,76 +470,6 @@ function exportNotes() {
     return;
   }
 
-  function exportChatHistory() {
-    if (!chatHistory.length) {
-      showToast('No chat messages to export');
-      return;
-    }
-
-    async function importSavedNotes(file) {
-      if (file.size > 1024 * 1024) {
-        showToast('Notes backup is too large (maximum 1 MB)');
-        return;
-      }
-
-      let importedNotes;
-      let invalidCount = 0;
-      try {
-        const parsed = JSON.parse(await file.text());
-        if (!Array.isArray(parsed)) {
-          showToast('Notes backup must contain a JSON array');
-          return;
-        }
-        importedNotes = parsed.filter(isValidSavedNote);
-        invalidCount = parsed.length - importedNotes.length;
-      } catch (error) {
-        showToast('Could not read notes backup; check that it is valid JSON');
-        return;
-      }
-
-      if (!importedNotes.length) {
-        showToast('No valid notes were found in this backup');
-        return;
-      }
-
-      const seenIds = new Set();
-      const mergedNotes = [...importedNotes, ...savedNotes].filter((note) => {
-        if (seenIds.has(note.id)) return false;
-        seenIds.add(note.id);
-        return true;
-      }).slice(0, 5);
-
-      if (mergedNotes.length === savedNotes.length
-        && mergedNotes.every((note, index) => note.id === savedNotes[index]?.id)) {
-        showToast(invalidCount
-          ? `These notes are already saved; skipped ${invalidCount} invalid entr${invalidCount === 1 ? 'y' : 'ies'}`
-          : 'These notes are already saved');
-        return;
-      }
-
-      if (!writeStorage(NOTES_STORAGE_KEY, JSON.stringify(mergedNotes))) return;
-      const addedCount = mergedNotes.filter((note) => !savedNotes.some((saved) => saved.id === note.id)).length;
-      savedNotes = mergedNotes;
-      renderNotes();
-      const skippedMessage = invalidCount
-        ? `; skipped ${invalidCount} invalid entr${invalidCount === 1 ? 'y' : 'ies'}`
-        : '';
-      showToast(`Imported ${addedCount} note${addedCount === 1 ? '' : 's'}${skippedMessage} (up to 5 are kept)`);
-    }
-
-    const data = JSON.stringify(chatHistory, null, 2);
-    const blob = new Blob([data], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `mba-buddy-chat-${new Date().toISOString().slice(0, 10)}.json`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-    showToast(`Exported ${chatHistory.length} chat message${chatHistory.length === 1 ? '' : 's'}`);
-  }
-
   const data = JSON.stringify(savedNotes, null, 2);
   const blob = new Blob([data], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
@@ -552,6 +483,76 @@ function exportNotes() {
   a.remove();
   URL.revokeObjectURL(url);
   showToast(`Exported ${savedNotes.length} note${savedNotes.length>1?'s':''}`);
+}
+
+function exportChatHistory() {
+  if (!chatHistory.length) {
+    showToast('No chat messages to export');
+    return;
+  }
+
+  const data = JSON.stringify(chatHistory, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `mba-buddy-chat-${new Date().toISOString().slice(0, 10)}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+  showToast(`Exported ${chatHistory.length} chat message${chatHistory.length === 1 ? '' : 's'}`);
+}
+
+async function importSavedNotes(file) {
+  if (file.size > 1024 * 1024) {
+    showToast('Notes backup is too large (maximum 1 MB)');
+    return;
+  }
+
+  let importedNotes;
+  let invalidCount = 0;
+  try {
+    const parsed = JSON.parse(await file.text());
+    if (!Array.isArray(parsed)) {
+      showToast('Notes backup must contain a JSON array');
+      return;
+    }
+    importedNotes = parsed.filter(isValidSavedNote);
+    invalidCount = parsed.length - importedNotes.length;
+  } catch (error) {
+    showToast('Could not read notes backup; check that it is valid JSON');
+    return;
+  }
+
+  if (!importedNotes.length) {
+    showToast('No valid notes were found in this backup');
+    return;
+  }
+
+  const seenIds = new Set();
+  const mergedNotes = [...importedNotes, ...savedNotes].filter((note) => {
+    if (seenIds.has(note.id)) return false;
+    seenIds.add(note.id);
+    return true;
+  }).slice(0, 5);
+
+  if (mergedNotes.length === savedNotes.length
+    && mergedNotes.every((note, index) => note.id === savedNotes[index]?.id)) {
+    showToast(invalidCount
+      ? `These notes are already saved; skipped ${invalidCount} invalid entr${invalidCount === 1 ? 'y' : 'ies'}`
+      : 'These notes are already saved');
+    return;
+  }
+
+  if (!writeStorage(NOTES_STORAGE_KEY, JSON.stringify(mergedNotes))) return;
+  const addedCount = mergedNotes.filter((note) => !savedNotes.some((saved) => saved.id === note.id)).length;
+  savedNotes = mergedNotes;
+  renderNotes();
+  const skippedMessage = invalidCount
+    ? `; skipped ${invalidCount} invalid entr${invalidCount === 1 ? 'y' : 'ies'}`
+    : '';
+  showToast(`Imported ${addedCount} note${addedCount === 1 ? '' : 's'}${skippedMessage} (up to 5 are kept)`);
 }
 
 function saveCurrentNote() {
@@ -600,7 +601,10 @@ function applyHistorySearch() {
   let visibleCount = 0;
 
   messageElements.forEach((message) => {
-    const matches = !query || message.textContent.toLocaleLowerCase().includes(query);
+    const bubble = message.querySelector('.msg-bubble')?.cloneNode(true);
+    bubble?.querySelector('.msg-meta')?.remove();
+    const messageText = bubble?.textContent || '';
+    const matches = !query || messageText.toLocaleLowerCase().includes(query);
     message.hidden = !matches;
     if (matches) visibleCount += 1;
   });
@@ -689,7 +693,43 @@ function addMessage(text, role, persist = true, timestamp = new Date().toISOStri
   }
 }
 
-messages.addEventListener('click', async (event) => {
+async function copyTextToClipboard(text) {
+  let clipboardFailed = false;
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      showToast('Response copied');
+      return;
+    }
+  } catch (error) {
+    clipboardFailed = true;
+  }
+
+  try {
+    const temporaryInput = document.createElement('textarea');
+    temporaryInput.value = text;
+    temporaryInput.setAttribute('readonly', '');
+    temporaryInput.style.position = 'fixed';
+    temporaryInput.style.opacity = '0';
+    document.body.appendChild(temporaryInput);
+    let copied;
+    try {
+      temporaryInput.select();
+      copied = document.execCommand('copy');
+    } finally {
+      temporaryInput.remove();
+    }
+    showToast(copied
+      ? 'Response copied'
+      : 'Could not copy the response; check browser permissions');
+  } catch (error) {
+    showToast(clipboardFailed
+      ? 'Could not access the clipboard; check browser permissions'
+      : 'This browser could not copy the response');
+  }
+}
+
+messages.addEventListener('click', (event) => {
   if (!(event.target instanceof Element)) return;
   const copyButton = event.target.closest('.copy-message');
   if (!copyButton) return;
@@ -697,12 +737,7 @@ messages.addEventListener('click', async (event) => {
   const message = copyButton.dataset.message;
   if (!message) return;
 
-  try {
-    await navigator.clipboard.writeText(message);
-    showToast('Response copied');
-  } catch (error) {
-    showToast('Could not access the clipboard; check browser permissions');
-  }
+  copyTextToClipboard(message);
 });
 
 function showTyping() {

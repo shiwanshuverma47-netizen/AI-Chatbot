@@ -477,6 +477,7 @@ body {
   max-width: 80%;
   animation: slideUp 0.25s ease;
 }
+.msg[hidden] { display: none; }
 .bot-msg { align-self: flex-start; }
 .user-msg {
   align-self: flex-end;
