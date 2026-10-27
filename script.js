@@ -26,6 +26,7 @@ const NOTES_STORAGE_KEY = 'mba-buddy-saved-notes';
 let activeSubject = 'finance';
 let chatHistory = [];
 let savedNotes = [];
+let activeQuiz = null;
 const pendingReplyTimers = new Set();
 
 function readStorage(key) {
@@ -145,6 +146,95 @@ const subjectReplies = {
     ]
   }
 };
+
+const quizQuestions = {
+  finance: [
+    {
+      question: 'What does NPV stand for?',
+      acceptedAnswers: ['net present value'],
+      explanation: 'NPV is the present value of expected cash flows minus the initial investment.'
+    },
+    {
+      question: 'In CAPM, what does beta measure?',
+      acceptedAnswers: ['systematic risk', 'market risk', 'sensitivity to market movements'],
+      explanation: 'Beta measures how sensitive an investment is to movements in the overall market.'
+    }
+  ],
+  marketing: [
+    {
+      question: 'What do the 4Ps describe?',
+      acceptedAnswers: ['product price place promotion', 'product, price, place, promotion', 'marketing mix'],
+      explanation: 'The 4Ps are Product, Price, Place, and Promotion—the elements of the marketing mix.'
+    },
+    {
+      question: 'In STP, what does the T stand for?',
+      acceptedAnswers: ['targeting', 'target'],
+      explanation: 'STP stands for Segmentation, Targeting, and Positioning.'
+    }
+  ],
+  hr: [
+    {
+      question: 'What is the main purpose of performance management?',
+      acceptedAnswers: ['improve performance', 'align and improve performance', 'support employee performance'],
+      explanation: 'Performance management aligns expectations, feedback, and development with work outcomes.'
+    },
+    {
+      question: 'What does OB stand for in management studies?',
+      acceptedAnswers: ['organizational behaviour', 'organizational behavior', 'organisation behaviour', 'organisation behavior'],
+      explanation: 'OB is Organizational Behaviour: the study of people and groups at work.'
+    }
+  ],
+  operations: [
+    {
+      question: 'What is the first step in the DMAIC cycle?',
+      acceptedAnswers: ['define'],
+      explanation: 'DMAIC starts with Define, followed by Measure, Analyze, Improve, and Control.'
+    },
+    {
+      question: 'What is safety stock held to protect against?',
+      acceptedAnswers: ['demand or supply uncertainty', 'uncertainty', 'unexpected demand or delays'],
+      explanation: 'Safety stock buffers against demand changes and replenishment delays.'
+    }
+  ]
+};
+
+function normalizeAnswer(value) {
+  return value.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+}
+
+function startQuiz(subject) {
+  activeQuiz = { subject, questionIndex: 0, correctAnswers: 0 };
+  const firstQuestion = quizQuestions[subject][0];
+  return `Let's do a ${quizQuestions[subject].length}-question ${subject} quiz. Reply with your answer, or type "stop quiz" to end.\n\nQuestion 1: ${firstQuestion.question}`;
+}
+
+function answerQuiz(userText) {
+  if (['stop quiz', 'quit quiz', 'exit quiz'].includes(normalizeAnswer(userText))) {
+    activeQuiz = null;
+    return 'Quiz stopped. You can start another one whenever you like.';
+  }
+
+  const questions = quizQuestions[activeQuiz.subject];
+  const question = questions[activeQuiz.questionIndex];
+  const answer = normalizeAnswer(userText);
+  const isCorrect = question.acceptedAnswers.some((accepted) => normalizeAnswer(accepted) === answer);
+  if (isCorrect) {
+    activeQuiz.correctAnswers += 1;
+  }
+
+  const feedback = isCorrect ? 'Correct!' : `Not quite. A good answer is: ${question.acceptedAnswers[0]}.`;
+  const explanation = question.explanation;
+  activeQuiz.questionIndex += 1;
+
+  if (activeQuiz.questionIndex >= questions.length) {
+    const result = `${feedback} ${explanation}\n\nQuiz complete: ${activeQuiz.correctAnswers} of ${questions.length} correct.`;
+    activeQuiz = null;
+    return result;
+  }
+
+  const nextQuestion = questions[activeQuiz.questionIndex];
+  return `${feedback} ${explanation}\n\nQuestion ${activeQuiz.questionIndex + 1}: ${nextQuestion.question}`;
+}
 
 function setActiveSubject(subject, button) {
   if (!Object.prototype.hasOwnProperty.call(subjectReplies, subject)) {
@@ -432,10 +522,13 @@ function sendMessage(text) {
 
 function getBotReply(userText, subject = activeSubject) {
   const lowerText = userText.toLowerCase();
-  const label = subject.charAt(0).toUpperCase() + subject.slice(1);
 
   if (lowerText.includes('quiz')) {
-    return `${subjectReplies[subject].quiz} (${label})`;
+    return startQuiz(subject);
+  }
+
+  if (activeQuiz) {
+    return answerQuiz(userText);
   }
 
   if (lowerText.includes('tip') || lowerText.includes('revision')) {
@@ -527,6 +620,7 @@ clearBtn.addEventListener('click', () => {
   pendingReplyTimers.forEach((timer) => clearTimeout(timer));
   pendingReplyTimers.clear();
   removeTyping();
+  activeQuiz = null;
   chatHistory = [];
   saveChatHistory();
   showEmptyState();
