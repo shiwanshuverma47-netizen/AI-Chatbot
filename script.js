@@ -52,25 +52,97 @@ const subjectReplies = {
     quiz: 'Quick finance quiz: What is the main difference between NPV and IRR?',
     tip: 'Finance revision tip: write one formula, one example, and one exam takeaway for every topic.',
     default: 'I can help with finance topics like NPV, CAPM, ratio analysis, and capital structure.',
-    focus: 'Finance • Build confidence with formulas and case examples'
+    focus: 'Finance • Build confidence with formulas and case examples',
+    topics: [
+      {
+        keywords: ['npv', 'net present value'],
+        answer: 'Net present value (NPV) is the present value of a project’s expected cash inflows minus its upfront investment. Discount future cash flows at the required return; a positive NPV means the project is expected to add value. Example: if discounted inflows are ₹1,20,000 and the initial cost is ₹1,00,000, NPV is ₹20,000.'
+      },
+      {
+        keywords: ['capm', 'capital asset pricing'],
+        answer: 'CAPM estimates a share’s required return: expected return = risk-free rate + beta × (market return − risk-free rate). Beta measures how sensitive the share is to market movements. For example, with a 6% risk-free rate, beta of 1.2, and a 5% market risk premium, the estimate is 12%.'
+      },
+      {
+        keywords: ['ratio analysis', 'financial ratio'],
+        answer: 'Ratio analysis compares financial statement figures to assess performance. Liquidity ratios (such as the current ratio) assess short-term obligations; profitability ratios (such as net margin) show profit generation; leverage ratios show reliance on debt. Compare ratios over time and against relevant peers.'
+      },
+      {
+        keywords: ['capital structure', 'debt equity', 'debt-equity'],
+        answer: 'Capital structure is the mix of debt and equity used to finance a business. Debt can lower the average cost of capital because interest may be tax-deductible, but too much debt increases fixed-payment and financial-distress risk. The appropriate mix depends on cash-flow stability, taxes, and business risk.'
+      }
+    ]
   },
   marketing: {
     quiz: 'Quick marketing quiz: Why is segmentation important in a go-to-market strategy?',
     tip: 'Marketing revision tip: connect each concept to one real brand example for faster recall.',
     default: 'I can help with marketing topics like 4Ps, STP, branding, and consumer behaviour.',
-    focus: 'Marketing • Compare brand strategy with practical campaign examples'
+    focus: 'Marketing • Compare brand strategy with practical campaign examples',
+    topics: [
+      {
+        keywords: ['4ps', 'marketing mix'],
+        answer: 'The marketing mix’s 4Ps are Product (what is offered), Price (what customers pay), Place (how it reaches them), and Promotion (how customers learn about it). Strong plans align all four—for example, premium pricing should match product quality, distribution, and brand messaging.'
+      },
+      {
+        keywords: ['stp', 'segmentation', 'targeting', 'positioning'],
+        answer: 'STP means Segmentation, Targeting, and Positioning. First group customers with shared needs, then select the segment(s) the business can serve well, and finally define how the offer should be perceived versus alternatives. A clear position guides product, pricing, and promotion decisions.'
+      },
+      {
+        keywords: ['consumer behaviour', 'consumer behavior'],
+        answer: 'Consumer behaviour studies how people choose, buy, use, and evaluate products. Needs, culture, social groups, personal circumstances, and perceptions can all influence a purchase. Mapping the customer journey helps marketers identify where useful information or support is needed.'
+      },
+      {
+        keywords: ['branding', 'brand strategy'],
+        answer: 'A brand strategy defines the promise and associations a business wants customers to remember. It combines a clear audience, a distinctive value proposition, consistent identity, and reliable customer experiences. Consistency across touchpoints helps build recognition and trust.'
+      }
+    ]
   },
   hr: {
     quiz: 'Quick HR quiz: What is the main purpose of performance management systems?',
     tip: 'HR revision tip: summarise each topic in one definition, one example, and one challenge.',
     default: 'I can help with HR topics like recruitment, performance management, and organizational behaviour.',
-    focus: 'HR • Link people practices to organizational outcomes'
+    focus: 'HR • Link people practices to organizational outcomes',
+    topics: [
+      {
+        keywords: ['recruitment', 'recruiting', 'hiring'],
+        answer: 'A recruitment process typically defines the role, attracts candidates, screens applications, assesses job-related skills, checks references where appropriate, and makes an offer. Clear criteria and structured interviews improve consistency and help reduce avoidable bias.'
+      },
+      {
+        keywords: ['performance management', 'performance review'],
+        answer: 'Performance management is an ongoing process of setting expectations, supporting work, reviewing progress, and agreeing on development. Useful goals are specific and connected to team outcomes. Regular feedback makes an annual review less surprising and more actionable.'
+      },
+      {
+        keywords: ['ob', 'organizational behaviour', 'organizational behavior'],
+        answer: 'Organizational behaviour (OB) examines how individuals and groups act at work and how organizational structures affect them. Common topics include motivation, leadership, communication, team dynamics, and culture. OB helps managers understand workplace behaviour and improve collaboration.'
+      },
+      {
+        keywords: ['labour law', 'labor law', 'employment law'],
+        answer: 'Employment and labour requirements depend on the jurisdiction, worker category, and current legislation. For an exam answer, identify the relevant rule, explain who it covers, and apply it to the facts. Verify legal details against current official sources rather than relying on a general summary.'
+      }
+    ]
   },
   operations: {
     quiz: 'Quick operations quiz: How does inventory management affect customer service?',
     tip: 'Operations revision tip: focus on process flow, bottlenecks, and key metrics.',
     default: 'I can help with operations topics like supply chain, Six Sigma, and inventory management.',
-    focus: 'Operations • Map the process flow and identify bottlenecks'
+    focus: 'Operations • Map the process flow and identify bottlenecks',
+    topics: [
+      {
+        keywords: ['supply chain', 'supply chain management'],
+        answer: 'A supply chain coordinates the flow of materials, information, and products from suppliers through production and distribution to customers. Managers balance cost, speed, quality, and resilience. Mapping the chain can reveal delays, excess inventory, or single points of failure.'
+      },
+      {
+        keywords: ['six sigma', 'six-sigma'],
+        answer: 'Six Sigma is a data-driven approach to reducing process defects and variation. Its DMAIC cycle is Define the problem, Measure current performance, Analyze causes, Improve the process, and Control the gains. Start with a measurable customer-impacting problem.'
+      },
+      {
+        keywords: ['tqm', 'total quality management'],
+        answer: 'Total Quality Management (TQM) is an organization-wide commitment to continuous improvement and customer-focused quality. It relies on employee involvement, process measurement, prevention of defects, and learning from results—not just inspecting finished products.'
+      },
+      {
+        keywords: ['inventory', 'stock management'],
+        answer: 'Inventory management balances having enough stock to meet demand against the cost of storing it. Reorder points, demand forecasts, lead times, and safety stock help guide decisions. Too little stock risks missed sales; too much ties up cash and space.'
+      }
+    ]
   }
 };
 
@@ -368,6 +440,13 @@ function getBotReply(userText, subject = activeSubject) {
 
   if (lowerText.includes('tip') || lowerText.includes('revision')) {
     return subjectReplies[subject].tip;
+  }
+
+  const topic = subjectReplies[subject].topics.find(({ keywords }) =>
+    keywords.some((keyword) => lowerText.includes(keyword))
+  );
+  if (topic) {
+    return topic.answer;
   }
 
   return subjectReplies[subject].default;
