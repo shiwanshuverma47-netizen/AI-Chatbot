@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const projectRoot = fileURLToPath(new URL('../', import.meta.url));
+const projectRoot = resolve(fileURLToPath(new URL('../', import.meta.url)));
 
 export function loadEnvironment(filePath = resolve(projectRoot, '.env'), target = process.env) {
   let contents;
@@ -31,8 +31,12 @@ export function loadEnvironment(filePath = resolve(projectRoot, '.env'), target 
 }
 
 export function getConfig(env = process.env) {
-  const model = env.AI_MODEL || 'llama-3.3-70b-versatile';
-  const baseUrl = env.AI_BASE_URL || 'https://api.groq.com/openai/v1';
+  const model = env.AI_MODEL?.trim() || 'llama-3.3-70b-versatile';
+  const baseUrl = env.AI_BASE_URL?.trim() || 'https://api.groq.com/openai/v1';
+  const port = env.PORT === undefined || env.PORT === '' ? 3000 : Number(env.PORT);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error('PORT must be an integer between 1 and 65535');
+  }
 
   let providerUrl;
   try {
@@ -43,12 +47,15 @@ export function getConfig(env = process.env) {
   if (providerUrl.protocol !== 'https:' && !['localhost', '127.0.0.1', '[::1]'].includes(providerUrl.hostname)) {
     throw new Error('AI_BASE_URL must use HTTPS except for localhost');
   }
+  if (providerUrl.username || providerUrl.password || providerUrl.search || providerUrl.hash) {
+    throw new Error('AI_BASE_URL must not include credentials, query parameters, or a fragment');
+  }
 
   return {
-    apiKey: env.AI_API_KEY || '',
+    apiKey: env.AI_API_KEY?.trim() || '',
     baseUrl: providerUrl.toString().replace(/\/+$/, ''),
     model,
-    port: Number(env.PORT) || 3000,
+    port,
     host: env.HOST || '127.0.0.1'
   };
 }

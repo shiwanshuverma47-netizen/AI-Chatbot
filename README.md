@@ -13,7 +13,10 @@ never placed in frontend code.
 ## Run locally
 
 1. Copy `.env.example` to `.env`.
-2. Set `AI_API_KEY` in `.env`. Keep this file private; it is ignored by Git.
+2. Create a new provider key in the provider dashboard, then set `AI_API_KEY` in
+   `.env`. Never paste API keys into chat, frontend code, or Git commits. If a
+   key has been shared or committed, revoke it and issue a replacement.
+   `.env` is ignored by Git.
 3. Optionally adjust `AI_BASE_URL`, `AI_MODEL`, `HOST`, or `PORT`.
 4. Start the app:
 
@@ -36,7 +39,8 @@ it does not silently substitute canned answers for AI responses.
   `history`. Subjects are `finance`, `marketing`, `hr`, and `operations`.
 - Chat requests are validated, limited in size and rate, and sent to the
   provider with a server-side timeout. Provider failures return explicit
-  errors.
+  errors, including actionable setup messages for rejected keys and unavailable
+  models.
 
 Run the backend tests with:
 
@@ -59,3 +63,8 @@ npm test
 Saved chat history, notes, and theme preferences remain in the browser's
 `localStorage`; they are not sent to the backend unless recent chat messages
 are included as context with a chat request.
+
+The provider key supplied in a chat request should be considered exposed.
+Revoke it in the provider dashboard and configure a newly generated key locally
+in `.env`; credentials are intentionally never copied into project files or
+GitHub.
