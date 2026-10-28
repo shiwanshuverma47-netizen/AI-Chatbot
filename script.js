@@ -23,6 +23,8 @@ const toast = document.getElementById('toast');
 const focusCopy = document.getElementById('focusCopy');
 const historySearch = document.getElementById('historySearch');
 const searchStatus = document.getElementById('searchStatus');
+const assistantStatusText = document.getElementById('assistantStatusText');
+const statusDot = document.getElementById('statusDot');
 
 const STORAGE_KEY = 'mba-buddy-chat-history';
 const THEME_STORAGE_KEY = window.MBA_BUDDY_CONFIG?.themeKey || 'mba-buddy-theme';
@@ -32,7 +34,7 @@ let activeSubject = 'finance';
 let chatHistory = [];
 let savedNotes = [];
 let activeQuiz = null;
-const pendingReplyTimers = new Set();
+const pendingRequests = new Set();
 
 function readStorage(key) {
   try {
@@ -376,6 +378,27 @@ function showToast(message) {
   showToast.timeoutId = setTimeout(() => toast.classList.remove('show'), 2200);
 }
 
+async function refreshBackendStatus() {
+  if (!assistantStatusText || !statusDot) return;
+  try {
+    const response = await fetch('/api/health');
+    const health = await response.json();
+    if (!response.ok || health.status !== 'ok') {
+      throw new Error('Backend health check failed');
+    }
+
+    assistantStatusText.textContent = health.providerConfigured
+      ? 'AI backend ready'
+      : 'Backend ready · AI key not configured';
+    statusDot.classList.toggle('offline', false);
+    statusDot.classList.toggle('unconfigured', !health.providerConfigured);
+  } catch (error) {
+    assistantStatusText.textContent = 'Backend unavailable · start with npm start';
+    statusDot.classList.add('offline');
+    statusDot.classList.remove('unconfigured');
+  }
+}
+
 function escapeHtml(value) {
   const container = document.createElement('div');
   container.textContent = value;
@@ -615,26 +638,66 @@ function applyHistorySearch() {
     : '';
 }
 
-function sendMessage(text) {
+async function requestChatReply(message, subject, history, signal) {
+  const response = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ message, subject, history }),
+    signal
+  });
+
+  let result;
+  try {
+    result = await response.json();
+  } catch (error) {
+    throw new Error('The server returned an invalid response. Please try again.');
+  }
+
+  if (!response.ok) {
+    throw new Error(result?.error?.message || 'The server could not answer this question.');
+  }
+  if (typeof result.reply !== 'string' || !result.reply.trim()) {
+    throw new Error('The server returned an empty answer. Please try again.');
+  }
+
+  return result.reply.trim();
+}
+
+async function sendMessage(text) {
   const value = text.trim();
   if (!value) return;
 
   const subjectAtSend = activeSubject;
+  const useLocalQuiz = value.toLowerCase().includes('quiz') || Boolean(activeQuiz);
+  const recentHistory = chatHistory.slice(-10).map(({ text: historyText, role }) => ({
+    text: historyText,
+    role
+  }));
+  const controller = new AbortController();
+  pendingRequests.add(controller);
   addMessage(value, 'user', true);
   userInput.value = '';
-  if (!pendingReplyTimers.size) {
+  if (pendingRequests.size === 1) {
     showTyping();
   }
 
-  const timer = setTimeout(() => {
-    pendingReplyTimers.delete(timer);
-    if (!pendingReplyTimers.size) {
+  try {
+    const reply = useLocalQuiz
+      ? getBotReply(value, subjectAtSend)
+      : await requestChatReply(value, subjectAtSend, recentHistory, controller.signal);
+    if (!controller.signal.aborted) {
+      addMessage(reply, 'bot', true);
+    }
+  } catch (error) {
+    if (!controller.signal.aborted) {
+      showToast(error.message || 'The server could not answer this question.');
+    }
+  } finally {
+    pendingRequests.delete(controller);
+    if (!pendingRequests.size) {
       removeTyping();
     }
-    const reply = getBotReply(value, subjectAtSend);
-    addMessage(reply, 'bot', true);
-  }, 1000);
-  pendingReplyTimers.add(timer);
+  }
 }
 
 function getBotReply(userText, subject = activeSubject) {
@@ -787,8 +850,8 @@ clearBtn.addEventListener('click', () => {
   if (chatHistory.length && !window.confirm('Clear this study conversation?')) {
     return;
   }
-  pendingReplyTimers.forEach((timer) => clearTimeout(timer));
-  pendingReplyTimers.clear();
+  pendingRequests.forEach((controller) => controller.abort());
+  pendingRequests.clear();
   removeTyping();
   activeQuiz = null;
   chatHistory = [];
@@ -847,6 +910,7 @@ document.addEventListener('keydown', (event) => {
 });
 
 initializeTheme();
+refreshBackendStatus();
 chatHistory = loadChatHistory();
 savedNotes = loadSavedNotes();
 renderNotes();
