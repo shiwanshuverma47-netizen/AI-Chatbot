@@ -408,6 +408,12 @@ body {
   background: #22c55e;
   display: inline-block;
 }
+.status-dot.unconfigured {
+  background: #f59e0b;
+}
+.status-dot.offline {
+  background: #ef4444;
+}
 .header-badge {
   font-size: 12px;
   font-weight: 600;

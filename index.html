@@ -96,8 +96,9 @@
         <div class="header-avatar"><i class="fa-solid fa-robot"></i></div>
         <div>
           <p class="header-name">MBA Buddy</p>
-          <p class="header-status">
-            <span class="status-dot"></span>Study prompts ready
+          <p class="header-status" role="status" aria-live="polite">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="assistantStatusText">Checking backend...</span>
           </p>
         </div>
       </div>
