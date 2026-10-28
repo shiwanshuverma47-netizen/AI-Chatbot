@@ -54,9 +54,11 @@ function readJsonBody(request) {
     let rejected = false;
     request.setEncoding('utf8');
     request.on('data', (chunk) => {
+      if (rejected) return;
       body += chunk;
-      if (!rejected && Buffer.byteLength(body) > MAX_BODY_BYTES) {
+      if (Buffer.byteLength(body) > MAX_BODY_BYTES) {
         rejected = true;
+        body = '';
         rejectBody(new ChatRequestError(413, 'BODY_TOO_LARGE', 'Request body exceeds 16 KB'));
       }
     });
@@ -183,7 +185,7 @@ export function createServer({
       } catch (error) {
         if (error instanceof ChatRequestError || error instanceof ProviderError) {
           sendJson(response, error.status, {
-            error: { code: error.code || 'AI_SERVICE_ERROR', message: error.message }
+            error: { code: error.code, message: error.message }
           });
           return;
         }

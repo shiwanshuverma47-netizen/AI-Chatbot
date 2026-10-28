@@ -11,9 +11,10 @@ export class ChatRequestError extends Error {
 }
 
 export class ProviderError extends Error {
-  constructor(status, message) {
+  constructor(status, code, message) {
     super(message);
     this.status = status;
+    this.code = code;
   }
 }
 
@@ -63,15 +64,20 @@ export function validateChatRequest(body) {
 function createSystemPrompt(subject) {
   return [
     'You are MBA Buddy, a clear and supportive MBA study assistant.',
-    `The learner selected ${subject}. Keep explanations accurate, structured, and appropriate for MBA coursework.`,
-    'Use concise examples when useful. If you are unsure, say so instead of inventing facts.',
-    'For legal, regulatory, or current information, explain that the learner should check an authoritative up-to-date source.'
+    `The learner selected ${subject}. Answer the question directly and tailor explanations to MBA coursework in this subject.`,
+    'Use plain language and organize longer answers with short headings or bullets. Define important terms, explain reasoning, and show formulas with units and a brief worked example when relevant.',
+    'Check arithmetic and distinguish assumptions from facts. Never invent statistics, citations, laws, or sources. If a question is ambiguous, ask one focused clarifying question.',
+    'For legal, regulatory, financial-market, or other time-sensitive information, clearly note uncertainty and recommend checking a current authoritative source.'
   ].join(' ');
 }
 
 export async function generateChatReply({ request, config, fetchImpl = fetch }) {
   if (!config.apiKey) {
-    throw new ProviderError(503, 'AI service is not configured. Add AI_API_KEY to the server environment.');
+    throw new ProviderError(
+      503,
+      'AI_SERVICE_NOT_CONFIGURED',
+      'AI service is not configured. Add AI_API_KEY to the server environment.'
+    );
   }
 
   const controller = new AbortController();
@@ -99,31 +105,49 @@ export async function generateChatReply({ request, config, fetchImpl = fetch }) 
     });
 
     if (!response.ok) {
-      const status = response.status === 429 ? 503 : 502;
-      throw new ProviderError(status, response.status === 429
-        ? 'The AI service is busy. Please try again shortly.'
-        : 'The AI service could not complete this request.');
+      if (response.status === 401 || response.status === 403) {
+        throw new ProviderError(
+          502,
+          'AI_AUTH_FAILED',
+          'The AI provider rejected the server credentials. Check AI_API_KEY.'
+        );
+      }
+      if (response.status === 404) {
+        throw new ProviderError(
+          502,
+          'AI_MODEL_UNAVAILABLE',
+          'The AI provider could not find the configured model or endpoint. Check AI_MODEL and AI_BASE_URL.'
+        );
+      }
+      if (response.status === 429) {
+        throw new ProviderError(503, 'AI_RATE_LIMITED', 'The AI service is busy. Please try again shortly.');
+      }
+      throw new ProviderError(502, 'AI_PROVIDER_ERROR', 'The AI service could not complete this request.');
     }
 
     let result;
     try {
       result = await response.json();
     } catch (error) {
-      throw new ProviderError(502, 'The AI service returned an invalid response.');
+      throw new ProviderError(502, 'AI_INVALID_RESPONSE', 'The AI service returned an invalid response.');
     }
 
     const reply = result?.choices?.[0]?.message?.content;
     if (typeof reply !== 'string' || !reply.trim()) {
-      throw new ProviderError(502, 'The AI service returned an empty response.');
+      throw new ProviderError(502, 'AI_EMPTY_RESPONSE', 'The AI service returned an empty response.');
     }
 
     return { reply: reply.trim(), model: config.model };
   } catch (error) {
     if (error instanceof ProviderError) throw error;
     if (error.name === 'AbortError') {
-      throw new ProviderError(504, 'The AI service took too long to respond. Please try again.');
+      throw new ProviderError(504, 'AI_TIMEOUT', 'The AI service took too long to respond. Please try again.');
     }
-    throw new ProviderError(502, 'Could not reach the AI service. Check the server connection and try again.');
+    throw new ProviderError(
+      502,
+      'AI_CONNECTION_FAILED',
+      'Could not reach the AI service. Check the server connection and try again.'
+    );
   } finally {
     clearTimeout(timeout);
   }
