@@ -207,10 +207,10 @@ function normalizeAnswer(value) {
   return value.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
 }
 
-function containsAnswerPhrase(answer, acceptedAnswer) {
-  const normalizedAnswer = normalizeAnswer(answer);
-  const normalizedPhrase = normalizeAnswer(acceptedAnswer);
-  return ` ${normalizedAnswer} `.includes(` ${normalizedPhrase} `);
+function containsPhrase(text, phrase) {
+  const normalizedText = normalizeAnswer(text);
+  const normalizedPhrase = normalizeAnswer(phrase);
+  return ` ${normalizedText} `.includes(` ${normalizedPhrase} `);
 }
 
 function startQuiz(subject) {
@@ -228,7 +228,7 @@ function answerQuiz(userText) {
   const questions = quizQuestions[activeQuiz.subject];
   const question = questions[activeQuiz.questionIndex];
   const isCorrect = question.acceptedAnswers.some((accepted) =>
-    containsAnswerPhrase(userText, accepted)
+    containsPhrase(userText, accepted)
   );
   if (isCorrect) {
     activeQuiz.correctAnswers += 1;
@@ -713,7 +713,7 @@ function getBotReply(userText, subject = activeSubject) {
   }
 
   const topic = subjectReplies[subject].topics.find(({ keywords }) =>
-    keywords.some((keyword) => lowerText.includes(keyword))
+    keywords.some((keyword) => containsPhrase(userText, keyword))
   );
   if (topic) {
     return topic.answer;
