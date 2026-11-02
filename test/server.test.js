@@ -206,3 +206,19 @@ test('enforces per-client chat limits', async () => {
   assert.equal(limited.status, 429);
   assert.ok(Number(limited.headers.get('retry-after')) > 0);
 });
+
+test('bounds tracked clients and removes expired records', () => {
+  let now = 0;
+  const rateLimiter = new RateLimiter({ limit: 1, windowMs: 1_000, maxClients: 2, now: () => now });
+
+  rateLimiter.consume('first');
+  rateLimiter.consume('second');
+  rateLimiter.consume('third');
+  assert.equal(rateLimiter.clients.size, 2);
+  assert.equal(rateLimiter.clients.has('first'), false);
+
+  now = 1_000;
+  rateLimiter.consume('fourth');
+  assert.equal(rateLimiter.clients.size, 1);
+  assert.equal(rateLimiter.clients.has('fourth'), true);
+});
