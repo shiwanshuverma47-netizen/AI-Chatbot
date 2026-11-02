@@ -21,8 +21,6 @@ const importNotesFile = document.getElementById('importNotesFile');
 const notesPanel = document.getElementById('notesPanel');
 const toast = document.getElementById('toast');
 const focusCopy = document.getElementById('focusCopy');
-const historySearch = document.getElementById('historySearch');
-const searchStatus = document.getElementById('searchStatus');
 const assistantStatusText = document.getElementById('assistantStatusText');
 const statusDot = document.getElementById('statusDot');
 
@@ -603,7 +601,6 @@ function saveCurrentNote() {
 
 function showEmptyState() {
   messages.innerHTML = '<div class="empty-state">Start a conversation to save your study notes here.</div>';
-  applyHistorySearch();
 }
 
 function renderChatHistory() {
@@ -614,28 +611,6 @@ function renderChatHistory() {
   }
   chatHistory.forEach((entry) => addMessage(entry.text, entry.role, false, entry.timestamp));
   messages.scrollTop = messages.scrollHeight;
-  applyHistorySearch();
-}
-
-function applyHistorySearch() {
-  if (!historySearch || !searchStatus) return;
-  const query = historySearch.value.trim().toLocaleLowerCase();
-  const messageElements = messages.querySelectorAll('.msg[data-chat-message="true"]');
-  let visibleCount = 0;
-
-  messageElements.forEach((message) => {
-    const bubble = message.querySelector('.msg-bubble')?.cloneNode(true);
-    bubble?.querySelector('.msg-meta')?.remove();
-    const messageText = bubble?.textContent || '';
-    const matches = !query || messageText.toLocaleLowerCase().includes(query);
-    message.hidden = !matches;
-    if (matches) visibleCount += 1;
-  });
-
-  searchStatus.hidden = !query;
-  searchStatus.textContent = query
-    ? (visibleCount ? `${visibleCount} matching message${visibleCount === 1 ? '' : 's'}` : 'No matching messages')
-    : '';
 }
 
 async function requestChatReply(message, subject, history, signal) {
@@ -747,7 +722,6 @@ function addMessage(text, role, persist = true, timestamp = new Date().toISOStri
 
   messages.appendChild(div);
   messages.scrollTop = messages.scrollHeight;
-  applyHistorySearch();
 
   if (persist) {
     chatHistory.push({ text, role, timestamp });
@@ -840,7 +814,6 @@ userInput.addEventListener('keydown', (event) => {
     sendMessage(userInput.value);
   }
 });
-historySearch?.addEventListener('input', applyHistorySearch);
 
 quizBtn.addEventListener('click', () => {
   sendMessage(`Quiz me on ${activeSubject.charAt(0).toUpperCase() + activeSubject.slice(1)}`);
