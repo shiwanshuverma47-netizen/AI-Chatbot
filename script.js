@@ -441,22 +441,37 @@ function renderNotes() {
     return;
   }
 
-  notesPanel.innerHTML = savedNotes
-    .map((note) => `
-      <article class="note-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
-          <strong>${escapeHtml(note.subject)}</strong>
-          <button class="note-delete" data-id="${escapeHtml(note.id)}" aria-label="Delete note">✕</button>
-        </div>
-        <span>${escapeHtml(note.createdAt)}</span>
-        <p>${escapeHtml(note.title)}</p>
-        <details class="note-details">
-          <summary>View response summary</summary>
-          <p>${escapeHtml(note.content)}</p>
-        </details>
-      </article>
-    `)
-    .join('');
+  notesPanel.replaceChildren();
+  savedNotes.forEach((note) => {
+    const card = document.createElement('article');
+    card.className = 'note-card';
+
+    const heading = document.createElement('div');
+    heading.className = 'note-card-heading';
+    const subject = document.createElement('strong');
+    subject.textContent = note.subject;
+    const deleteButton = document.createElement('button');
+    deleteButton.className = 'note-delete';
+    deleteButton.dataset.id = note.id;
+    deleteButton.type = 'button';
+    deleteButton.setAttribute('aria-label', 'Delete note');
+    deleteButton.textContent = '✕';
+    heading.append(subject, deleteButton);
+
+    const date = document.createElement('span');
+    date.textContent = note.createdAt;
+    const title = document.createElement('p');
+    title.textContent = note.title;
+    const details = document.createElement('details');
+    details.className = 'note-details';
+    const summary = document.createElement('summary');
+    summary.textContent = 'View response summary';
+    const content = document.createElement('p');
+    content.textContent = note.content;
+    details.append(summary, content);
+    card.append(heading, date, title, details);
+    notesPanel.append(card);
+  });
 
   notesPanel.querySelectorAll('.note-delete').forEach((button) => {
     button.addEventListener('click', (event) => {

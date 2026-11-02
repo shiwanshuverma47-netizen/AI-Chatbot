@@ -226,6 +226,12 @@ body {
   flex-direction: column;
   gap: 6px;
 }
+.note-card-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
 .note-card strong {
   color: var(--white);
   font-size: 12px;
