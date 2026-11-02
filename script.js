@@ -32,6 +32,7 @@ let activeSubject = 'finance';
 let chatHistory = [];
 let savedNotes = [];
 let activeQuiz = null;
+let nextTurnSequence = 0;
 const pendingRequests = new Set();
 
 function readStorage(key) {
@@ -599,19 +600,28 @@ async function importSavedNotes(file) {
 }
 
 function saveCurrentNote() {
-  if (!chatHistory.length) {
+  const latestUserEntry = [...chatHistory].reverse().find((entry) => entry.role === 'user');
+  if (!latestUserEntry) {
     showToast('Start a conversation first');
     return;
   }
 
-  const latestUserEntry = [...chatHistory].reverse().find((entry) => entry.role === 'user');
-  const latestBotEntry = [...chatHistory].reverse().find((entry) => entry.role === 'bot');
+  const latestBotEntry = latestUserEntry.turnId
+    ? chatHistory.find((entry) => entry.role === 'bot' && entry.turnId === latestUserEntry.turnId)
+    : chatHistory[chatHistory.indexOf(latestUserEntry) + 1]?.role === 'bot'
+      ? chatHistory[chatHistory.indexOf(latestUserEntry) + 1]
+      : null;
+  if (!latestBotEntry) {
+    showToast('Wait for a complete assistant response before saving a note');
+    return;
+  }
+
   const note = {
     id: Date.now().toString(),
     subject: activeBadge?.textContent || activeSubject.charAt(0).toUpperCase() + activeSubject.slice(1),
-    title: latestUserEntry ? latestUserEntry.text : 'Study session',
+    title: latestUserEntry.text,
     createdAt: new Date().toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }),
-    content: latestBotEntry ? latestBotEntry.text : subjectReplies[activeSubject].default
+    content: latestBotEntry.text
   };
 
   const nextNotes = [note, ...savedNotes].slice(0, 5);
@@ -631,7 +641,7 @@ function renderChatHistory() {
     showEmptyState();
     return;
   }
-  chatHistory.forEach((entry) => addMessage(entry.text, entry.role, false, entry.timestamp));
+  chatHistory.forEach((entry) => addMessage(entry.text, entry.role, false, entry.timestamp, entry.turnId));
   messages.scrollTop = messages.scrollHeight;
 }
 
@@ -666,13 +676,14 @@ async function sendMessage(text) {
 
   const subjectAtSend = activeSubject;
   const useLocalQuiz = value.toLowerCase().includes('quiz') || Boolean(activeQuiz);
+  const turnId = `${Date.now().toString(36)}-${(++nextTurnSequence).toString(36)}`;
   const recentHistory = chatHistory.slice(-10).map(({ text: historyText, role }) => ({
     text: historyText,
     role
   }));
   const controller = new AbortController();
   pendingRequests.add(controller);
-  addMessage(value, 'user', true);
+  addMessage(value, 'user', true, new Date().toISOString(), turnId);
   userInput.value = '';
   if (pendingRequests.size === 1) {
     showTyping();
@@ -683,7 +694,7 @@ async function sendMessage(text) {
       ? getBotReply(value, subjectAtSend)
       : await requestChatReply(value, subjectAtSend, recentHistory, controller.signal);
     if (!controller.signal.aborted) {
-      addMessage(reply, 'bot', true);
+      addMessage(reply, 'bot', true, new Date().toISOString(), turnId);
     }
   } catch (error) {
     if (!controller.signal.aborted) {
@@ -727,7 +738,7 @@ function formatTime(timestamp) {
   return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
-function addMessage(text, role, persist = true, timestamp = new Date().toISOString()) {
+function addMessage(text, role, persist = true, timestamp = new Date().toISOString(), turnId = null) {
   const div = document.createElement('div');
   div.className = 'msg ' + (role === 'bot' ? 'bot-msg' : 'user-msg');
   div.dataset.chatMessage = 'true';
@@ -746,7 +757,7 @@ function addMessage(text, role, persist = true, timestamp = new Date().toISOStri
   messages.scrollTop = messages.scrollHeight;
 
   if (persist) {
-    chatHistory.push({ text, role, timestamp });
+    chatHistory.push({ text, role, timestamp, ...(turnId ? { turnId } : {}) });
     saveChatHistory();
     updateExportChatButtonState();
   }
