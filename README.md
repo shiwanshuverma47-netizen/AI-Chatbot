@@ -2,8 +2,8 @@
 
 MBA Buddy is a study assistant for MBA Finance, Marketing, HR, and Operations.
 The browser UI is served by a small Node.js backend. Chat questions are sent to
-an OpenAI-compatible AI provider from the server; provider credentials are
-never placed in frontend code.
+the configured OpenAI-compatible AI provider from the server; provider
+credentials are never placed in frontend code.
 
 ## Requirements
 
@@ -61,10 +61,11 @@ npm test
 | `style.css` | Responsive layout and themes |
 
 Saved chat history, notes, and theme preferences remain in the browser's
-`localStorage`; they are not sent to the backend unless recent chat messages
-are included as context with a chat request.
+`localStorage`. When asking a question, the latest conversation messages are
+sent to the backend and then to the configured AI provider as context. Saved
+notes and theme preferences are not sent.
 
-The provider key supplied in a chat request should be considered exposed.
-Revoke it in the provider dashboard and configure a newly generated key locally
-in `.env`; credentials are intentionally never copied into project files or
-GitHub.
+Never put an API key in a chat request, frontend code, or a commit. If a key has
+been shared or committed, revoke it with the provider and configure a new key
+locally in `.env`. Removing a key from the latest version does not remove it
+from older Git history, so previously committed keys must still be revoked.
