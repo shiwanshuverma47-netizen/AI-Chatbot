@@ -207,6 +207,12 @@ function normalizeAnswer(value) {
   return value.toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
 }
 
+function containsAnswerPhrase(answer, acceptedAnswer) {
+  const normalizedAnswer = normalizeAnswer(answer);
+  const normalizedPhrase = normalizeAnswer(acceptedAnswer);
+  return ` ${normalizedAnswer} `.includes(` ${normalizedPhrase} `);
+}
+
 function startQuiz(subject) {
   activeQuiz = { subject, questionIndex: 0, correctAnswers: 0 };
   const firstQuestion = quizQuestions[subject][0];
@@ -221,8 +227,9 @@ function answerQuiz(userText) {
 
   const questions = quizQuestions[activeQuiz.subject];
   const question = questions[activeQuiz.questionIndex];
-  const answer = normalizeAnswer(userText);
-  const isCorrect = question.acceptedAnswers.some((accepted) => normalizeAnswer(accepted) === answer);
+  const isCorrect = question.acceptedAnswers.some((accepted) =>
+    containsAnswerPhrase(userText, accepted)
+  );
   if (isCorrect) {
     activeQuiz.correctAnswers += 1;
   }
